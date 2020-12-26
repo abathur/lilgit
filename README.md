@@ -13,7 +13,7 @@ So, I wrote lilgit. Merry Christmas.
 
 ## How do I use this?
 This is still a pretty rough cut, but I currently:
-- including something like [default.nix](default.nix) as a dependency for my bashrc package
+- include something like [default.nix](default.nix) as a dependency for my bashrc package
 - update my bashrc to include
     - `source lilgit.bash` 
     - use `$__lilgit` in my PS1
