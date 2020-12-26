@@ -1,14 +1,14 @@
 #with import <n> {};
 { lib, stdenv, fetchFromGitHub, doCheck ? true, shellcheck, bashInteractive, git, python3 }:
 let
-  src = lib.cleanSource ../../../../work/lilgit;
-  # src = fetchFromGitHub {
-  #   owner = "abathur";
-  #   repo = "lilgit";
-  #   rev = "b6753c6c17be8b021eedffd57a6918f80b914662";
-  #   # rev = "v${version}";
-  #   sha256 = "0jninx8aasa83g38qdpzy86m71xkpk7dzz8fvnab3lyk9fll4jk0";
-  # };
+  # src = lib.cleanSource ../../../../work/lilgit;
+  src = fetchFromGitHub {
+    owner = "abathur";
+    repo = "lilgit";
+    rev = "dc9f749fb808bfb254098a247a7afc2548425f57";
+    # rev = "v${version}";
+    hash = "sha256-RJdTfoviyAvl/ayUzdqWFRSQZCklRcOSb47OnLcvEiY=";
+  };
   lilgitd = python3.pkgs.buildPythonPackage {
     name = "lilgitd";
     inherit src;
