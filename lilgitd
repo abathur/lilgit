@@ -75,6 +75,8 @@ else:
 
     # invoke handle_io on a SIGIO event
     signal.signal(signal.SIGIO, handle_io)
+    # try not dying on ctrl-c
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     # send io events on stdin (fd 0) to our process
     assert fcntl.fcntl(0, fcntl.F_SETOWN, os.getpid()) == 0
     # tell the os to produce SIGIO events when data is written to stdin
