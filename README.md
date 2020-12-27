@@ -11,6 +11,17 @@ I in turn was dumb enough to snipe myself by noticing:
 
 So, I wrote lilgit. Merry Christmas.
 
+## What does it cover?
+Some of the speed comes from cutting corners, so I know it won't be acceptable for everyone. I'm happy to discuss cases where you think it is wrong or misleading (especially if we can make it more accurate without a large performance penalty). It covers:
+- a "name", which is
+    - blank if not in repo
+    - branch name if on branch
+    - `detached @ 11_chars_of_hash` if detached
+- my idiomatic sense of whether the working copy is ~dirty:
+    - latest commit on branch != latest on remote branch
+    - working copy differs from upstream
+    - working copy differs from HEAD
+
 ## How do I use this?
 This is still a pretty rough cut, but I currently:
 - include something like [default.nix](default.nix) as a dependency for my bashrc package

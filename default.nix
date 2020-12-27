@@ -5,9 +5,9 @@ let
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "lilgit";
-    rev = "dc9f749fb808bfb254098a247a7afc2548425f57";
+    rev = "30d7ba3d3bf859d77606847861d0552725174f76";
     # rev = "v${version}";
-    hash = "sha256-RJdTfoviyAvl/ayUzdqWFRSQZCklRcOSb47OnLcvEiY=";
+    hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
   };
   lilgitd = python3.pkgs.buildPythonPackage {
     name = "lilgitd";
