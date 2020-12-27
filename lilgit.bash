@@ -1,7 +1,10 @@
 # shellcheck shell=bash
-# TODO: eval not necessary, but osh doesn't like
-# the coproc syntax, so I'm hiding it from resholve
-eval "coproc __lilgitter (lilgitd)"
+
+# osh doesn't like the named coproc syntax, but I don't want
+# this to break if someone's using a coproc? I think maybe
+# copying the FDs over to our own var is a fine compromise
+coproc lilgitd
+declare -a __lilgitter=("${COPROC[@]}")
 
 __go_on_now_lilgit(){
   local dirty name

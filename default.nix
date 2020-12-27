@@ -1,5 +1,5 @@
 #with import <n> {};
-{ lib, stdenv, fetchFromGitHub, doCheck ? true, shellcheck, bashInteractive, git, python3 }:
+{ lib, stdenv, resholve, fetchFromGitHub, doCheck ? true, shellcheck, bashInteractive, git, python3 }:
 let
   # src = lib.cleanSource ../../../../work/lilgit;
   src = fetchFromGitHub {
@@ -14,27 +14,32 @@ let
     inherit src;
     doCheck = false;
     buildInputs = [];
-    propagatedBuildInputs = [ python3.pkgs.pygit2 ];
+    propagatedBuildInputs = [ git python3.pkgs.pygit2 ];
   };
 in
-stdenv.mkDerivation rec {
+resholve.resholvePackage rec {
   version = "unset";
   pname = "lilgit";
   inherit src;
-  patchPhase = ''
-    substituteInPlace lilgit.bash --replace lilgitd ${lilgitd}/bin/.lilgitd-wrapped
-  '';
+  solutions = {
+    plugin = {
+      scripts = [ "bin/lilgit.bash" ];
+      inputs = [ lilgitd ];
+      interpreter = "none";
+    };
+  };
   installPhase = ''
     mkdir -p $out/bin
     install lilgit.bash $out/bin/lilgit.bash
   '';
 
   inherit doCheck;
-  checkInputs = [ shellcheck bashInteractive ];
   doInstallCheck = doCheck;
   installCheckPhase = with stdenv.lib; ''
-    shellcheck ./lilgit.bash
-    ( source ./lilgit.bash )
+    ${shellcheck}/bin/shellcheck $out/bin/lilgit.bash
+    # env to avoid python path problems
+    # https://github.com/NixOS/nixpkgs/pull/102613 may fix
+    env -i ${bashInteractive}/bin/bash -c "source $out/bin/lilgit.bash"
   '';
 
   meta = with stdenv.lib; {
