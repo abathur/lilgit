@@ -1,7 +1,7 @@
 setup_file(){
   {
     TEST_TMP="$(mktemp -d)"
-    cp tests/*.{bats,bash,sh} "$TEST_TMP"/ > /dev/null
+    cp tests/*.{bats,bash} "$TEST_TMP"/ > /dev/null
     pushd "$TEST_TMP"
     PATH="$TEST_TMP:$PATH"
   } > /dev/null

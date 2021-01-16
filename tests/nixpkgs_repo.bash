@@ -2,7 +2,7 @@ setup_file(){
   echo "test,status-provider,time,footprint" >> "$out/timings"
   # set -x
   export TEST_TMP="$(mktemp -d)"
-  cp tests/*.{bats,bash,sh} "$TEST_TMP"/ > /dev/null
+  cp tests/*.{bats,bash} "$TEST_TMP"/ > /dev/null
   mkdir "$TEST_TMP/nixpkgs"
   git clone $NIXPKGS "$TEST_TMP/nixpkgs"
   pushd "$TEST_TMP"
