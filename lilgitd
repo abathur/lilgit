@@ -45,7 +45,6 @@ def dirty(repo_path, repo, detached, head, name):
 def report(start_path):
     try:
         path = pygit2.discover_repository(start_path)
-        os.environ["PWD"] = start_path
         repo = pygit2.Repository(path)
         detached = repo.head_is_detached
         head = repo.head
