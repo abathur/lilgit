@@ -1,15 +1,19 @@
-#with import <n> {};
-{ lib, stdenv, resholve, fetchFromGitHub, doCheck ? true, shellcheck, bashInteractive, git, python3 }:
+{ pkgs ? import <nixpkgs> { }, doInstallCheck ? true }:
+
+with pkgs;
+# { lib, resholvePackage, fetchFromGitHub, doCheck ? true, doInstallCheck ? true, shellcheck, bashInteractive, git, python3 }:
 let
-  # src = lib.cleanSource ../../../../work/lilgit;
-  src = fetchFromGitHub {
-    owner = "abathur";
-    repo = "lilgit";
-    rev = "30d7ba3d3bf859d77606847861d0552725174f76";
-    # rev = "v${version}";
-    hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
-  };
-  lilgitd = python3.pkgs.buildPythonPackage {
+  src = lib.cleanSource ./.;
+  # src = fetchFromGitHub {
+  #   owner = "abathur";
+  #   repo = "lilgit";
+  #   rev = "30d7ba3d3bf859d77606847861d0552725174f76";
+  #   # rev = "v${version}";
+  #   hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
+  # };
+  # TODO: temporary until bats update PR can be merged
+  bats121 = callPackage ./bats.nix { };
+  lilgitd = python3.pkgs.buildPythonApplication {
     name = "lilgitd";
     inherit src;
     doCheck = false;
@@ -17,32 +21,36 @@ let
     propagatedBuildInputs = [ git python3.pkgs.pygit2 ];
   };
 in
-resholve.resholvePackage rec {
+resholvePackage rec {
   version = "unset";
   pname = "lilgit";
   inherit src;
   solutions = {
     plugin = {
       scripts = [ "bin/lilgit.bash" ];
-      inputs = [ lilgitd ];
+      inputs = [ lilgitd git coreutils ];
       interpreter = "none";
     };
   };
+
   installPhase = ''
     mkdir -p $out/bin
     install lilgit.bash $out/bin/lilgit.bash
   '';
 
-  inherit doCheck;
-  doInstallCheck = doCheck;
-  installCheckPhase = with stdenv.lib; ''
+  installCheckInputs = [ bashInteractive git shellcheck bats121 ];
+  inherit doInstallCheck;
+  SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
+  installCheckPhase = ''
+    export LILGIT=$out/bin/lilgit.bash
     ${shellcheck}/bin/shellcheck $out/bin/lilgit.bash
-    # env to avoid python path problems
-    # https://github.com/NixOS/nixpkgs/pull/102613 may fix
-    env -i ${bashInteractive}/bin/bash -c "source $out/bin/lilgit.bash"
+    find .
+    ls -la tests
+    cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
+    bats tests/ephemeral.bats
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "A smol (quick) git status plugin";
     homepage = https://github.com/abathur/lilgit;
     license = licenses.mit;

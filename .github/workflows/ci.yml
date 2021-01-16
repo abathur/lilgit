@@ -1,0 +1,49 @@
+name: "Test"
+on:
+  pull_request:
+  push:
+  schedule:
+    # every sunday morning
+    - cron: "0 0 * * 0"
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+      fail-fast: false
+    steps:
+    - name: Checkout lilgit
+      uses: actions/checkout@v2
+      with:
+        path: lilgit
+    - uses: cachix/install-nix-action@v12
+      with:
+        # TODO: temporarily use my nixpkgs for resholve fix
+        nix_path: nixpkgs=https://github.com/abathur/nixpkgs/archive/fix/resholve-do-not-propagate.tar.gz
+    - run: nix-build lilgit/default.nix
+  # macOS only because it depends on bsd 'footprint' for
+  # easy measuring of RAM footprint...
+  performance:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest ]
+      fail-fast: false
+    steps:
+    - name: Checkout lilgit
+      uses: actions/checkout@v2
+      with:
+        path: lilgit
+    - name: Checkout nixpkgs
+      uses: actions/checkout@v2
+      with:
+        repository: nixos/nixpkgs
+        path: nixpkgs
+        fetch-depth: 0
+    - uses: cachix/install-nix-action@v12
+      with:
+        # nix_path: nixpkgs=channel:nixos-unstable
+        nix_path: nixpkgs=https://github.com/abathur/nixpkgs/archive/fix/resholve-do-not-propagate.tar.gz
+    - run: nix-build lilgit/ci.nix --option sandbox false
+
