@@ -10,7 +10,7 @@ Merry Christmas.
 
 ## How do I try it out?
 
-If you have Nix installed and are on `nixpkgs-unstable` or `nixos-unstable-small` (but not `nixos-unstable`, yet), you can open a lilgit ~demo shell by running:
+If you have Nix installed and are on any of the `-unstable` channels you can open a lilgit ~demo shell by running:
 
 ```console
 nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
@@ -42,14 +42,14 @@ I don't see any reason why it shouldn't work in other shells, and I'm [open to h
 
 ## How do I use this?
 
-Lilgit's prerequisites are now in `nixpkgs-unstable`. If you use `bash` and `nixpkgs-unstable`, you can get the lilgit package like:
+If you use `bash` and an `*-unstable` channel, you can get the lilgit package like:
 
 ```nix
 lilgit = import (self.fetchFromGitHub {
   owner = "abathur";
   repo = "lilgit";
-  rev = "8d091a3b0f094c31163ca877a62408027e9386d9";
-  hash = "sha256-GaeWbl+nLPI+mAQ2d4Kag8y3cXUd7O/yu6DZugKIVe8=";
+  rev = "76d0ac8d2907bd322dd1dfb1603f445354d89ded";
+  hash = "sha256-DAbOGGMAY1v3QWXFpGs+bo70SG2o4WfjGYokqBBOXwU=";
 }) { };
 ```
 
