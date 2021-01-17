@@ -6,7 +6,7 @@ on:
     # every sunday morning
     - cron: "0 0 * * 0"
 jobs:
-  tests:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -23,6 +23,19 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
         # nix_path: nixpkgs=https://github.com/abathur/nixpkgs/archive/fix/resholve-do-not-propagate.tar.gz
     - run: nix-build lilgit/default.nix
+  demo:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+      fail-fast: false
+    steps:
+    - uses: cachix/install-nix-action@v12
+      with:
+        # TODO: temporarily use my nixpkgs for resholve fix
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+        # nix_path: nixpkgs=https://github.com/abathur/nixpkgs/archive/fix/resholve-do-not-propagate.tar.gz
+    - run: echo declare -p __lilgit | nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
   # macOS only because it depends on bsd 'footprint' for
   # easy measuring of RAM footprint...
   performance:
