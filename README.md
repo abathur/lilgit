@@ -14,6 +14,10 @@ If you have Nix installed and are on any of the `-unstable` channels you can ope
 
 ```console
 nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
+
+# If you're on a different channel you can specify it explicitly--but
+# I won't *recommend* it since you may be in for a long build/wait...
+nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")' -I nixpkgs=channel:nixpkgs-unstable
 ```
 
 Each time you run a command, it'll clearly indicate lilgit's output, and how long it took to generate.
