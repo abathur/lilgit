@@ -8,24 +8,88 @@ I noticed it was still a little slow, and that it returns a lot of detail I don'
 
 Merry Christmas.
 
+## How do I try it out?
+
+If you have Nix installed and are on `nixpkgs-unstable` or `nixos-unstable-small` (but not `nixos-unstable`, yet), you can open a lilgit ~demo shell by running:
+
+```console
+nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
+```
+
+Each time you run a command, it'll clearly indicate lilgit's output, and how long it took to generate.
+
 ## What does it cover?
-Some of the speed comes from cutting corners, so I know it won't be acceptable for everyone. I'm happy to discuss cases where you think it is wrong or misleading (especially if we can make it more accurate without a large performance penalty). It covers:
-- a "name", which is
-    - blank if not in repo
-    - branch name if on branch
-    - `detached @ 11_chars_of_hash` if detached
-    - "plain" if clean, and red if dirty
-- my idiomatic sense of whether the working copy is ~dirty:
-    - latest commit on branch != latest on remote branch
+
+Some of the speed comes from what I've left out, so I know it won't be acceptable for everyone. I'm happy to discuss cases where you think it is wrong or misleading (especially if we can make it more accurate without a large performance penalty).
+
+It prints a "name", which is:
+- blank if not in repo
+- branch name if on branch
+- `detached @ 11_chars_of_hash` if detached
+
+That name is:
+- plain/uncolored if "clean"
+- red if it meets my idiomatic sense of "dirty":
+    - latest local commit != latest upstream
     - working copy differs from upstream
     - working copy differs from HEAD
 
+## Does this work in $SHELL?
+
+I assume it just works in bash for now, because the MVP depends on bash `coproc`.
+
+I don't see any reason why it shouldn't work in other shells, and I'm [open to help improving the daemonization model](https://github.com/abathur/lilgit/issues/2).
+
 ## How do I use this?
-This is still a pretty rough cut, but I currently:
-- include something like [default.nix](default.nix) as a dependency for my bashrc package
-- update my bashrc to include
-    - `source lilgit.bash` 
-    - include `$__lilgit` in my PS1
+
+Lilgit's prerequisites are now in `nixpkgs-unstable`. If you use `bash` and `nixpkgs-unstable`, you can get the lilgit package like:
+
+```nix
+lilgit = import (self.fetchFromGitHub {
+  owner = "abathur";
+  repo = "lilgit";
+  rev = "8d091a3b0f094c31163ca877a62408027e9386d9";
+  hash = "sha256-GaeWbl+nLPI+mAQ2d4Kag8y3cXUd7O/yu6DZugKIVe8=";
+}) { };
+```
+
+From here, you'll need to `source lilgit.bash` from your bashrc/profile,  add `$__lilgit` to your `PS1`, and make sure your profile can find lilgit when it runs.
+
+There are two main ways to do this:
+1. add `lilgit` to your system/user packages, and let your profile find lilgit via `PATH` lookup
+2. explicitly write/substitute the correct path to lilgit into your profile
+
+The exact steps you'd take to write/substitute it will depend on how you have your bashrc/profile set up.
+
+I personally define a separate package for my bashrc, which looks a little like:
+```nix
+{ resholvePackage, shellcheck, lilgit }:
+
+resholvePackage rec {
+  version = "unset";
+  pname = "bashrc";
+
+  src = ./.;
+
+  installPhase = ''
+    install -Dv bashrc $out/bin/bashrc
+  '';
+
+  solutions = {
+    profile = {
+      interpreter = "none";
+      inputs = [ lilgit ];
+      scripts = [ "bin/bashrc" ];
+    };
+  };
+
+  doInstallCheck = true;
+  installCheckInputs = [ shellcheck ];
+  installCheckPhase = ''
+    shellcheck -x $out/bin/bashrc
+  '';
+}
+```
 
 ## Performance
 
