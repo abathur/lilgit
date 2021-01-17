@@ -34,8 +34,7 @@ resholvePackage rec {
   };
 
   installPhase = ''
-    mkdir -p $out/bin
-    install lilgit.bash $out/bin/lilgit.bash
+    install -Dv lilgit.bash $out/bin/lilgit.bash
   '';
 
   installCheckInputs = [ bashInteractive git shellcheck bats121 ];
@@ -44,8 +43,6 @@ resholvePackage rec {
   installCheckPhase = ''
     export LILGIT=$out/bin/lilgit.bash
     ${shellcheck}/bin/shellcheck $out/bin/lilgit.bash
-    find .
-    ls -la tests
     cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
     bats tests/ephemeral.bats
   '';
