@@ -11,8 +11,6 @@ let
   #   # rev = "v${version}";
   #   hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
   # };
-  # TODO: temporary until bats update PR can be merged
-  bats121 = callPackage ./bats.nix { };
   lilgitd = python3.pkgs.buildPythonApplication {
     name = "lilgitd";
     inherit src;
@@ -37,8 +35,9 @@ resholvePackage rec {
     install -Dv lilgit.bash $out/bin/lilgit.bash
   '';
 
-  installCheckInputs = [ bashInteractive git shellcheck bats121 ];
+  installCheckInputs = [ bashInteractive git shellcheck bats ];
   inherit doInstallCheck;
+  # for pygit2; get errors on linux w/o
   SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
   installCheckPhase = ''
     export LILGIT=$out/bin/lilgit.bash
