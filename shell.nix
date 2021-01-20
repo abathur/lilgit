@@ -6,8 +6,8 @@ let
   demo = ./prompt_demo.sh;
 in
 pkgs.mkShell {
-  buildInputs = [ lilgit bashInteractive_5 ];
+  buildInputs = [ lilgit bashInteractive ];
   shellHook = ''
-    exec /usr/bin/env -i LILGITBASH="${lilgit}/bin/lilgit.bash" ${bashInteractive_5}/bin/bash --rcfile ${demo} --noprofile -i
+    exec /usr/bin/env -i LILGITBASH="${lilgit}/bin/lilgit.bash" ${bashInteractive}/bin/bash --rcfile ${demo} --noprofile -i
   '';
 }
