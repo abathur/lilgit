@@ -1,7 +1,8 @@
 { pkgs ? import <nixpkgs> { }, doInstallCheck ? true }:
 
 with pkgs;
-# { lib, resholvePackage, fetchFromGitHub, doCheck ? true, doInstallCheck ? true, shellcheck, bashInteractive, git, python3 }:
+# TODO: below may be outdated per riir
+# { lib, resholvePackage, fetchFromGitHub, doCheck ? true, doInstallCheck ? true, shellcheck, bashInteractive, git }:
 let
   src = lib.cleanSource ./.;
   # src = fetchFromGitHub {
@@ -11,13 +12,7 @@ let
   #   # rev = "v${version}";
   #   hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
   # };
-  lilgitd = python3.pkgs.buildPythonApplication {
-    name = "lilgitd";
-    inherit src;
-    doCheck = false;
-    buildInputs = [];
-    propagatedBuildInputs = [ git python3.pkgs.pygit2 ];
-  };
+  lilgitd = callPackage ./lilgitd.nix { };
 in
 resholvePackage rec {
   version = "unset";
@@ -26,7 +21,7 @@ resholvePackage rec {
   solutions = {
     plugin = {
       scripts = [ "bin/lilgit.bash" ];
-      inputs = [ lilgitd git coreutils ];
+      inputs = [ lilgitd git coreutils ]; # lilgitd
       interpreter = "none";
     };
   };
@@ -37,17 +32,16 @@ resholvePackage rec {
 
   installCheckInputs = [ bashInteractive git shellcheck bats ];
   inherit doInstallCheck;
-  # for pygit2; get errors on linux w/o
-  SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
   installCheckPhase = ''
     export LILGIT=$out/bin/lilgit.bash
     ${shellcheck}/bin/shellcheck $out/bin/lilgit.bash
     cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
     bats tests/ephemeral.bats
+    echo WAT?
   '';
 
   meta = with lib; {
-    description = "A smol (quick) git status plugin";
+    description = "A smol (quick) git status prompt plugin";
     homepage = https://github.com/abathur/lilgit;
     license = licenses.mit;
     maintainers = with maintainers; [ abathur ];

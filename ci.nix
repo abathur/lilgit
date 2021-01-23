@@ -4,6 +4,10 @@ with pkgs;
 let
   nixpkgs = ../nixpkgs;
   our_lilgit = callPackage ./default.nix { };
+  # override for bash_5
+  our_bats = bats.overrideAttrs ( old: rec {
+    buildInputs = [ bash_5 ];
+  });
 in
 stdenv.mkDerivation {
   name = "lilgit-ci";
@@ -13,7 +17,7 @@ stdenv.mkDerivation {
       == "tests") ./.;
 
   doCheck = true;
-  checkInputs = with pkgs; [ bash_5 gitAndTools.gitstatus git our_lilgit time bats unixtools.column ];
+  checkInputs = with pkgs; [ bash_5 gitAndTools.gitstatus git our_lilgit time our_bats unixtools.column ];
 
   installPhase = ''
     column -s, -t $out/timings
@@ -22,7 +26,6 @@ stdenv.mkDerivation {
   LILGIT="${our_lilgit}/bin/lilgit.bash";
   GITSTATUS="${gitAndTools.gitstatus}/gitstatus.plugin.sh";
   NIXPKGS="${nixpkgs}";
-  # RSGITFSMON="${gitAndTools.rs-git-fsmonitor}/bin/rs-git-fsmonitor";
 
   checkPhase = ''
     mkdir $out
@@ -30,9 +33,6 @@ stdenv.mkDerivation {
     cat tests/head_nixpkgs.bats tests/repo.bash > tests/ephemeral.bats
     RUNS=1 bats tests/ephemeral.bats
     RUNS=10 bats tests/ephemeral.bats
-    # TODO: I want 100 here, but there's some
-    # flaky hang condition; lowering to increase
-    # odds we can complete any given test run
-    RUNS=20 bats tests/ephemeral.bats
+    RUNS=100 bats tests/ephemeral.bats
   '';
 }

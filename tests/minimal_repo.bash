@@ -1,10 +1,8 @@
 setup_file(){
-  {
-    TEST_TMP="$(mktemp -d)"
-    cp tests/*.{bats,bash} "$TEST_TMP"/ > /dev/null
-    pushd "$TEST_TMP"
-    PATH="$TEST_TMP:$PATH"
-  } > /dev/null
+  TEST_TMP="$(mktemp -d)"
+  cp tests/*.{bats,bash} "$TEST_TMP"/
+  pushd "$TEST_TMP"
+  PATH="$TEST_TMP:$PATH"
   mkdir a b
   pushd a
   git init
@@ -23,7 +21,7 @@ setup_file(){
   pushd b
   git config user.email "you@example.com"
   git config user.name "Your Name"
-}
+} > /dev/null
 
 teardown_file(){
   popd

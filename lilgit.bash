@@ -8,12 +8,12 @@ declare -a __lilgitter=("${COPROC[@]}")
 
 __go_on_now_lilgit(){
   local dirty name
-  # shellcheck disable=SC2154
+
   echo "$PWD" 1>&"${__lilgitter[1]}"
   read -r -u "${__lilgitter[0]}" is_repo dirty name
   # only print if it's a repo
-  if [[ $is_repo == "True" ]]; then
-    if [[ $dirty == "True" ]]; then
+  if [[ $is_repo == "true" ]]; then
+    if [[ $dirty == "true" ]]; then
       printf ' \033[0m\033[0;31m%s\033[0m' "$name"
     else
       printf ' %s' "$name"

@@ -1,0 +1,25 @@
+[package]
+name = "lilgitd"
+version = "0.0.0"
+authors = ["Travis A. Everett <travis.a.everett@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/abathur/lilgit"
+description = "A smol (quick) git status prompt plugin"
+edition = "2018"
+
+[[bin]]
+name = "lilgitd"
+path = "lilgitd.rs"
+
+[dependencies]
+git2 = "0.13.16"
+libc = "0.2.82"
+
+[dependencies.tokio]
+version = "1.0.2"
+features = [
+	"macros",
+	"signal",
+	"rt-multi-thread"
+]

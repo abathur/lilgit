@@ -102,153 +102,153 @@ This isn't a perfect picture, but you can find a benchmark table in each CI run'
 ```
 test                                          status-provider  time   footprint
 ----                                          ----             ----   ----
-'1x clean @ master'                           lilgit.bash      342ms  12MB
-'1x clean @ master'                           gitstatus.bash   786ms  29MB
-'1x clean @ master'                           gitparse.bash    932ms  2880KB
+'1x clean @ master'                           lilgit.bash      315ms  2276KB
+'1x clean @ master'                           gitstatus.bash   865ms  30MB
+'1x clean @ master'                           gitparse.bash    1.0s   2924KB
 ----                                          ----             ----   ----
-'1x clean @ detached'                         lilgit.bash      215ms  12MB
-'1x clean @ detached'                         gitstatus.bash   726ms  29MB
-'1x clean @ detached'                         gitparse.bash    953ms  2892KB
+'1x clean @ detached'                         lilgit.bash      101ms  2276KB
+'1x clean @ detached'                         gitstatus.bash   925ms  30MB
+'1x clean @ detached'                         gitparse.bash    984ms  2888KB
 ----                                          ----             ----   ----
-'1x clean @ new branch'                       lilgit.bash      339ms  11MB
-'1x clean @ new branch'                       gitstatus.bash   782ms  29MB
-'1x clean @ new branch'                       gitparse.bash    366ms  2892KB
+'1x clean @ new branch'                       lilgit.bash      218ms  2272KB
+'1x clean @ new branch'                       gitstatus.bash   872ms  29MB
+'1x clean @ new branch'                       gitparse.bash    352ms  2900KB
 ----                                          ----             ----   ----
-'1x dirty after rm'                           lilgit.bash      340ms  12MB
-'1x dirty after rm'                           gitstatus.bash   788ms  29MB
-'1x dirty after rm'                           gitparse.bash    327ms  2904KB
+'1x dirty after rm'                           lilgit.bash      259ms  2272KB
+'1x dirty after rm'                           gitstatus.bash   803ms  30MB
+'1x dirty after rm'                           gitparse.bash    334ms  2880KB
 ----                                          ----             ----   ----
-'1x clean after reset --hard'                 lilgit.bash      359ms  11MB
-'1x clean after reset --hard'                 gitstatus.bash   777ms  29MB
-'1x clean after reset --hard'                 gitparse.bash    352ms  2900KB
+'1x clean after reset --hard'                 lilgit.bash      251ms  2268KB
+'1x clean after reset --hard'                 gitstatus.bash   845ms  30MB
+'1x clean after reset --hard'                 gitparse.bash    350ms  2828KB
 ----                                          ----             ----   ----
-'1x dirty after append'                       lilgit.bash      351ms  11MB
-'1x dirty after append'                       gitstatus.bash   779ms  29MB
-'1x dirty after append'                       gitparse.bash    363ms  2900KB
+'1x dirty after append'                       lilgit.bash      228ms  2284KB
+'1x dirty after append'                       gitstatus.bash   824ms  30MB
+'1x dirty after append'                       gitparse.bash    359ms  2916KB
 ----                                          ----             ----   ----
-'1x dirty after stage'                        lilgit.bash      327ms  12MB
-'1x dirty after stage'                        gitstatus.bash   830ms  29MB
-'1x dirty after stage'                        gitparse.bash    317ms  2888KB
+'1x dirty after stage'                        lilgit.bash      224ms  2276KB
+'1x dirty after stage'                        gitstatus.bash   885ms  30MB
+'1x dirty after stage'                        gitparse.bash    325ms  2908KB
 ----                                          ----             ----   ----
-'1x clean after commit'                       lilgit.bash      375ms  12MB
-'1x clean after commit'                       gitstatus.bash   801ms  29MB
-'1x clean after commit'                       gitparse.bash    299ms  2880KB
+'1x clean after commit'                       lilgit.bash      193ms  2256KB
+'1x clean after commit'                       gitstatus.bash   830ms  30MB
+'1x clean after commit'                       gitparse.bash    285ms  2864KB
 ----                                          ----             ----   ----
-'1x dirty after reset --soft w/o upstream'    lilgit.bash      335ms  12MB
-'1x dirty after reset --soft w/o upstream'    gitstatus.bash   818ms  29MB
-'1x dirty after reset --soft w/o upstream'    gitparse.bash    321ms  2872KB
+'1x dirty after reset --soft w/o upstream'    lilgit.bash      229ms  2276KB
+'1x dirty after reset --soft w/o upstream'    gitstatus.bash   800ms  30MB
+'1x dirty after reset --soft w/o upstream'    gitparse.bash    322ms  2912KB
 ----                                          ----             ----   ----
-'1x clean after reset --hard w/o upstream'    lilgit.bash      328ms  12MB
-'1x clean after reset --hard w/o upstream'    gitstatus.bash   799ms  29MB
-'1x clean after reset --hard w/o upstream'    gitparse.bash    380ms  2864KB
+'1x clean after reset --hard w/o upstream'    lilgit.bash      222ms  2264KB
+'1x clean after reset --hard w/o upstream'    gitstatus.bash   888ms  30MB
+'1x clean after reset --hard w/o upstream'    gitparse.bash    330ms  2940KB
 ----                                          ----             ----   ----
-'1x dirty after reset --soft w/ upstream'     lilgit.bash      210ms  12MB
-'1x dirty after reset --soft w/ upstream'     gitstatus.bash   759ms  29MB
-'1x dirty after reset --soft w/ upstream'     gitparse.bash    339ms  2892KB
+'1x dirty after reset --soft w/ upstream'     lilgit.bash      102ms  2296KB
+'1x dirty after reset --soft w/ upstream'     gitstatus.bash   846ms  30MB
+'1x dirty after reset --soft w/ upstream'     gitparse.bash    339ms  2904KB
 ----                                          ----             ----   ----
-'1x dirty after reset --hard w/ upstream'     lilgit.bash      209ms  12MB
-'1x dirty after reset --hard w/ upstream'     gitstatus.bash   788ms  30MB
-'1x dirty after reset --hard w/ upstream'     gitparse.bash    354ms  2880KB
+'1x dirty after reset --hard w/ upstream'     lilgit.bash      108ms  2288KB
+'1x dirty after reset --hard w/ upstream'     gitstatus.bash   872ms  30MB
+'1x dirty after reset --hard w/ upstream'     gitparse.bash    368ms  2884KB
 
 test                                          status-provider  time   footprint
 ----                                          ----             ----   ----
-'10x clean @ master'                          lilgit.bash      1.14s  12MB
-'10x clean @ master'                          gitstatus.bash   2.56s  29MB
-'10x clean @ master'                          gitparse.bash    7.97s  2932KB
+'10x clean @ master'                          lilgit.bash      1.28s  2428KB
+'10x clean @ master'                          gitstatus.bash   2.62s  30MB
+'10x clean @ master'                          gitparse.bash    8.59s  2900KB
 ----                                          ----             ----   ----
-'10x clean @ detached'                        lilgit.bash      215ms  12MB
-'10x clean @ detached'                        gitstatus.bash   2.32s  30MB
-'10x clean @ detached'                        gitparse.bash    2.45s  2936KB
+'10x clean @ detached'                        lilgit.bash      110ms  2288KB
+'10x clean @ detached'                        gitstatus.bash   2.75s  30MB
+'10x clean @ detached'                        gitparse.bash    2.77s  2916KB
 ----                                          ----             ----   ----
-'10x clean @ new branch'                      lilgit.bash      1.27s  12MB
-'10x clean @ new branch'                      gitstatus.bash   2.32s  29MB
-'10x clean @ new branch'                      gitparse.bash    1.87s  2920KB
+'10x clean @ new branch'                      lilgit.bash      1.33s  2368KB
+'10x clean @ new branch'                      gitstatus.bash   2.71s  30MB
+'10x clean @ new branch'                      gitparse.bash    2.23s  2964KB
 ----                                          ----             ----   ----
-'10x dirty after rm'                          lilgit.bash      1.26s  12MB
-'10x dirty after rm'                          gitstatus.bash   2.31s  29MB
-'10x dirty after rm'                          gitparse.bash    1.90s  2912KB
+'10x dirty after rm'                          lilgit.bash      1.38s  2372KB
+'10x dirty after rm'                          gitstatus.bash   2.69s  30MB
+'10x dirty after rm'                          gitparse.bash    2.19s  2940KB
 ----                                          ----             ----   ----
-'10x clean after reset --hard'                lilgit.bash      1.28s  12MB
-'10x clean after reset --hard'                gitstatus.bash   2.30s  29MB
-'10x clean after reset --hard'                gitparse.bash    1.92s  2908KB
+'10x clean after reset --hard'                lilgit.bash      1.38s  2384KB
+'10x clean after reset --hard'                gitstatus.bash   2.75s  30MB
+'10x clean after reset --hard'                gitparse.bash    2.19s  2948KB
 ----                                          ----             ----   ----
-'10x dirty after append'                      lilgit.bash      1.26s  12MB
-'10x dirty after append'                      gitstatus.bash   2.20s  29MB
-'10x dirty after append'                      gitparse.bash    1.83s  2920KB
+'10x dirty after append'                      lilgit.bash      1.33s  2380KB
+'10x dirty after append'                      gitstatus.bash   2.57s  30MB
+'10x dirty after append'                      gitparse.bash    1.98s  2892KB
 ----                                          ----             ----   ----
-'10x dirty after stage'                       lilgit.bash      1.27s  12MB
-'10x dirty after stage'                       gitstatus.bash   2.16s  29MB
-'10x dirty after stage'                       gitparse.bash    1.86s  2916KB
+'10x dirty after stage'                       lilgit.bash      1.33s  2376KB
+'10x dirty after stage'                       gitstatus.bash   2.52s  30MB
+'10x dirty after stage'                       gitparse.bash    1.96s  2936KB
 ----                                          ----             ----   ----
-'10x clean after commit'                      lilgit.bash      1.12s  12MB
-'10x clean after commit'                      gitstatus.bash   2.13s  29MB
-'10x clean after commit'                      gitparse.bash    1.68s  2904KB
+'10x clean after commit'                      lilgit.bash      1.9s   2364KB
+'10x clean after commit'                      gitstatus.bash   2.54s  30MB
+'10x clean after commit'                      gitparse.bash    1.82s  2928KB
 ----                                          ----             ----   ----
-'10x dirty after reset --soft w/o upstream'   lilgit.bash      1.24s  12MB
-'10x dirty after reset --soft w/o upstream'   gitstatus.bash   2.12s  29MB
-'10x dirty after reset --soft w/o upstream'   gitparse.bash    1.83s  2964KB
+'10x dirty after reset --soft w/o upstream'   lilgit.bash      1.26s  2344KB
+'10x dirty after reset --soft w/o upstream'   gitstatus.bash   2.49s  30MB
+'10x dirty after reset --soft w/o upstream'   gitparse.bash    2.2s   2928KB
 ----                                          ----             ----   ----
-'10x clean after reset --hard w/o upstream'   lilgit.bash      1.25s  12MB
-'10x clean after reset --hard w/o upstream'   gitstatus.bash   2.23s  29MB
-'10x clean after reset --hard w/o upstream'   gitparse.bash    1.85s  2920KB
+'10x clean after reset --hard w/o upstream'   lilgit.bash      1.29s  2356KB
+'10x clean after reset --hard w/o upstream'   gitstatus.bash   2.67s  29MB
+'10x clean after reset --hard w/o upstream'   gitparse.bash    2.13s  2928KB
 ----                                          ----             ----   ----
-'10x dirty after reset --soft w/ upstream'    lilgit.bash      212ms  12MB
-'10x dirty after reset --soft w/ upstream'    gitstatus.bash   2.12s  30MB
-'10x dirty after reset --soft w/ upstream'    gitparse.bash    1.97s  2888KB
+'10x dirty after reset --soft w/ upstream'    lilgit.bash      112ms  2408KB
+'10x dirty after reset --soft w/ upstream'    gitstatus.bash   2.56s  30MB
+'10x dirty after reset --soft w/ upstream'    gitparse.bash    2.3s   2900KB
 ----                                          ----             ----   ----
-'10x dirty after reset --hard w/ upstream'    lilgit.bash      211ms  12MB
-'10x dirty after reset --hard w/ upstream'    gitstatus.bash   2.12s  30MB
-'10x dirty after reset --hard w/ upstream'    gitparse.bash    1.99s  2944KB
+'10x dirty after reset --hard w/ upstream'    lilgit.bash      115ms  2408KB
+'10x dirty after reset --hard w/ upstream'    gitstatus.bash   2.48s  30MB
+'10x dirty after reset --hard w/ upstream'    gitparse.bash    2.7s   2932KB
 
 test                                          status-provider  time   footprint
 ----                                          ----             ----   ----
-'100x clean @ master'                         lilgit.bash      9.35s  13MB
-'100x clean @ master'                         gitstatus.bash   13.2s  29MB
-'100x clean @ master'                         gitparse.bash    1m15s  2968KB
+'100x clean @ master'                         lilgit.bash      10.9s  2436KB
+'100x clean @ master'                         gitstatus.bash   19.0s  30MB
+'100x clean @ master'                         gitparse.bash    1m22s  2980KB
 ----                                          ----             ----   ----
-'100x clean @ detached'                       lilgit.bash      278ms  12MB
-'100x clean @ detached'                       gitstatus.bash   13.3s  30MB
-'100x clean @ detached'                       gitparse.bash    18.1s  2960KB
+'100x clean @ detached'                       lilgit.bash      180ms  2296KB
+'100x clean @ detached'                       gitstatus.bash   19.5s  30MB
+'100x clean @ detached'                       gitparse.bash    19.5s  2928KB
 ----                                          ----             ----   ----
-'100x clean @ new branch'                     lilgit.bash      11.3s  12MB
-'100x clean @ new branch'                     gitstatus.bash   13.6s  29MB
-'100x clean @ new branch'                     gitparse.bash    17.6s  2944KB
+'100x clean @ new branch'                     lilgit.bash      11.7s  2404KB
+'100x clean @ new branch'                     gitstatus.bash   14.0s  30MB
+'100x clean @ new branch'                     gitparse.bash    18.5s  2980KB
 ----                                          ----             ----   ----
-'100x dirty after rm'                         lilgit.bash      11.0s  12MB
-'100x dirty after rm'                         gitstatus.bash   13.6s  29MB
-'100x dirty after rm'                         gitparse.bash    18.2s  2964KB
+'100x dirty after rm'                         lilgit.bash      11.4s  2376KB
+'100x dirty after rm'                         gitstatus.bash   13.9s  30MB
+'100x dirty after rm'                         gitparse.bash    19.2s  2980KB
 ----                                          ----             ----   ----
-'100x clean after reset --hard'               lilgit.bash      11.2s  12MB
-'100x clean after reset --hard'               gitstatus.bash   13.7s  29MB
-'100x clean after reset --hard'               gitparse.bash    17.9s  2936KB
+'100x clean after reset --hard'               lilgit.bash      11.7s  2392KB
+'100x clean after reset --hard'               gitstatus.bash   13.8s  30MB
+'100x clean after reset --hard'               gitparse.bash    18.6s  2964KB
 ----                                          ----             ----   ----
-'100x dirty after append'                     lilgit.bash      11.2s  12MB
-'100x dirty after append'                     gitstatus.bash   13.6s  29MB
-'100x dirty after append'                     gitparse.bash    17.9s  2980KB
+'100x dirty after append'                     lilgit.bash      11.5s  2376KB
+'100x dirty after append'                     gitstatus.bash   13.9s  30MB
+'100x dirty after append'                     gitparse.bash    18.4s  2988KB
 ----                                          ----             ----   ----
-'100x dirty after stage'                      lilgit.bash      11.3s  12MB
-'100x dirty after stage'                      gitstatus.bash   13.7s  29MB
-'100x dirty after stage'                      gitparse.bash    18.0s  2952KB
+'100x dirty after stage'                      lilgit.bash      11.5s  2372KB
+'100x dirty after stage'                      gitstatus.bash   13.8s  30MB
+'100x dirty after stage'                      gitparse.bash    18.7s  2972KB
 ----                                          ----             ----   ----
-'100x clean after commit'                     lilgit.bash      9.60s  12MB
-'100x clean after commit'                     gitstatus.bash   13.6s  29MB
-'100x clean after commit'                     gitparse.bash    16.0s  2964KB
+'100x clean after commit'                     lilgit.bash      9.39s  2384KB
+'100x clean after commit'                     gitstatus.bash   14.0s  30MB
+'100x clean after commit'                     gitparse.bash    15.8s  2956KB
 ----                                          ----             ----   ----
-'100x dirty after reset --soft w/o upstream'  lilgit.bash      11.1s  12MB
-'100x dirty after reset --soft w/o upstream'  gitstatus.bash   13.6s  29MB
-'100x dirty after reset --soft w/o upstream'  gitparse.bash    17.4s  2976KB
+'100x dirty after reset --soft w/o upstream'  lilgit.bash      11.1s  2396KB
+'100x dirty after reset --soft w/o upstream'  gitstatus.bash   13.8s  30MB
+'100x dirty after reset --soft w/o upstream'  gitparse.bash    18.4s  2976KB
 ----                                          ----             ----   ----
-'100x clean after reset --hard w/o upstream'  lilgit.bash      11.2s  12MB
-'100x clean after reset --hard w/o upstream'  gitstatus.bash   13.8s  30MB
-'100x clean after reset --hard w/o upstream'  gitparse.bash    17.7s  2920KB
+'100x clean after reset --hard w/o upstream'  lilgit.bash      11.3s  2400KB
+'100x clean after reset --hard w/o upstream'  gitstatus.bash   13.9s  30MB
+'100x clean after reset --hard w/o upstream'  gitparse.bash    18.6s  2972KB
 ----                                          ----             ----   ----
-'100x dirty after reset --soft w/ upstream'   lilgit.bash      349ms  13MB
-'100x dirty after reset --soft w/ upstream'   gitstatus.bash   13.7s  30MB
-'100x dirty after reset --soft w/ upstream'   gitparse.bash    19.5s  2960KB
+'100x dirty after reset --soft w/ upstream'   lilgit.bash      208ms  2356KB
+'100x dirty after reset --soft w/ upstream'   gitstatus.bash   14.0s  30MB
+'100x dirty after reset --soft w/ upstream'   gitparse.bash    18.8s  2980KB
 ----                                          ----             ----   ----
-'100x dirty after reset --hard w/ upstream'   lilgit.bash      338ms  14MB
-'100x dirty after reset --hard w/ upstream'   gitstatus.bash   13.6s  30MB
-'100x dirty after reset --hard w/ upstream'   gitparse.bash    19.0s  2948KB
+'100x dirty after reset --hard w/ upstream'   lilgit.bash      211ms  2376KB
+'100x dirty after reset --hard w/ upstream'   gitstatus.bash   13.9s  30MB
+'100x dirty after reset --hard w/ upstream'   gitparse.bash    18.7s  2972KB
 ```
 
 Notes:

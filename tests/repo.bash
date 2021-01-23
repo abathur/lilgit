@@ -59,8 +59,9 @@
 @test "${RUNS:-1}x dirty after reset --hard w/ upstream" {
   # TODO: working around some kind of race condition?
   # test if it can be removed at the end...
-  until git reset --hard HEAD; do
-    :
-  done
+  # until git reset --hard HEAD; do
+  #   :
+  # done
+  git reset --hard HEAD
   dirty "master"
 }

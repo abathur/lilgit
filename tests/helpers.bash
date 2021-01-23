@@ -131,7 +131,7 @@ timings(){
 
 clean() {
     timings
-    source ${LILGIT:-lilgit.bash}
+    source ${LILGIT:-lilgit.bash} 3>&-
     run __go_on_now_lilgit
 
     run _expect_line 0 "equals" " $1"
@@ -146,7 +146,7 @@ clean() {
 
 dirty() {
     timings
-    source ${LILGIT:-lilgit.bash}
+    source ${LILGIT:-lilgit.bash} 3>&-
     local expect
     printf -v expect $' \E[0m\E[0;31m%s\E[0m' "$1"
     run __go_on_now_lilgit
