@@ -56,5 +56,5 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: benchmark
       run: nix-build lilgit/ci.nix --option sandbox false
-      timeout-minutes: 20
+      timeout-minutes: 25
       continue-on-error: true
