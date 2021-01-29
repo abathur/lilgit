@@ -1,4 +1,4 @@
-use std::{io, process::Command, str};
+use std::{io, path::Path, process::Command, str};
 
 use git2::{Reference, Repository};
 use libc::{fcntl, getpid};
@@ -19,9 +19,8 @@ fn description(detached: bool, name: &str) -> String {
     }
 }
 
-// TODO std::path::{PathBuf} instead of String?
 fn dirty(
-    repo_path: &String,
+    repo_path: &Path,
     repo: &Repository,
     detached: bool,
     head: &Reference,
@@ -69,7 +68,7 @@ fn dirty(
     return false;
 }
 
-fn report(start_path: &String) -> Report {
+fn report(start_path: &Path) -> Report {
     let repo = match Repository::discover(start_path) {
         Ok(val) => val,
         Err(_err) => {
@@ -118,7 +117,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             match input.read_line(&mut from_shell) {
                 Ok(n) => {
                     if n > 3 {
-                        let out = report(&from_shell.trim().to_string());
+                        let arg = from_shell.trim().to_string();
+                        let out = report(&Path::new(&arg));
                         println!(
                             "{} {} {}",
                             out.is_repo.to_string(),
@@ -135,8 +135,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     } else if args.len() == 2 {
-        let path = std::env::args().nth(1).expect("repo path");
-        let out = report(&path);
+        let arg = std::env::args().nth(1).expect("repo path");
+        let out = report(&Path::new(&arg));
         println!(
             "{} {} {}",
             out.is_repo.to_string(),
@@ -147,7 +147,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else if args.len() > 2 {
         &args.next();
         for arg in args {
-            let out = report(&arg);
+            let out = report(&Path::new(&arg));
             println!(
                 "{} {} {} {}",
                 arg,
