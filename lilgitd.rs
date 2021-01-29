@@ -1,3 +1,14 @@
+/*
+ * lilgitd serves as a ~daemon component paired with a shell profile/prompt
+ * plugin. The shell plugin prints $PWD to lilgitd's stdin once per prompt
+ * and waits for it to print a response on stdout. lilgitd will read-loop on
+ * stdin, treat each line as a path, and attempt to print 3 values on stdout
+ * as a response:
+ * - whether the path is a repo
+ * - whether the repo is dirty
+ * - a description of the repo's checkout/worktree
+ */
+
 use std::{io, path::Path, process::Command, str};
 
 use git2::{Reference, Repository};
