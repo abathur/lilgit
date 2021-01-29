@@ -14,7 +14,6 @@ path = "lilgitd.rs"
 
 [dependencies]
 git2 = "0.13.16"
-libc = "0.2.82"
 
 [dependencies.tokio]
 version = "1.0.2"

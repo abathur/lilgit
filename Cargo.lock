@@ -138,7 +138,6 @@ name = "lilgitd"
 version = "0.0.0"
 dependencies = [
  "git2",
- "libc",
  "tokio",
 ]
 

@@ -1,8 +1,6 @@
 use std::{io, path::Path, process::Command, str};
 
 use git2::{Reference, Repository};
-use libc::{fcntl, getpid};
-
 use tokio::signal::unix::{signal, SignalKind};
 
 struct Report {
@@ -106,10 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut io_stream = signal(SignalKind::io())?;
         // get SIGINT, but do nothing with it (keep ctrl-c from killing us)
         let mut _int_stream = signal(SignalKind::interrupt())?;
-        unsafe {
-            fcntl(0, libc::F_SETOWN, getpid());
-            fcntl(0, libc::F_SETFL, libc::O_ASYNC);
-        }
+
         loop {
             // TODO: maybe worth declaring once and clearing
             // i.e. from_shell.clear();

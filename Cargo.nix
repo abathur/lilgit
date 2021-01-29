@@ -447,10 +447,6 @@ rec {
             packageId = "git2";
           }
           {
-            name = "libc";
-            packageId = "libc";
-          }
-          {
             name = "tokio";
             packageId = "tokio";
             features = [ "macros" "signal" "rt-multi-thread" ];
