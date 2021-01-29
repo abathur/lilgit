@@ -24,7 +24,7 @@ fn dirty(
     repo: &Repository,
     detached: bool,
     head: &Reference,
-    name: &String,
+    name: &str,
 ) -> bool {
     if !detached {
         let branch = repo.find_branch(&name, git2::BranchType::Local).unwrap();
