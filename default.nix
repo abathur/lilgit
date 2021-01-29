@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, doInstallCheck ? true }:
+{ pkgs ? import <nixpkgs> { }, doCheck ? true, doInstallCheck ? true }:
 
 with pkgs;
 # TODO: below may be outdated per riir
@@ -21,23 +21,28 @@ resholvePackage rec {
   solutions = {
     plugin = {
       scripts = [ "bin/lilgit.bash" ];
-      inputs = [ lilgitd git coreutils ]; # lilgitd
+      inputs = [ lilgitd git coreutils ];
       interpreter = "none";
     };
   };
+
+  inherit doCheck;
+  checkInputs = [ rustfmt shellcheck ];
+  checkPhase = ''
+    ${shellcheck}/bin/shellcheck lilgit.bash
+    ${rustfmt}/bin/rustfmt lilgitd.rs --check --edition 2018
+  '';
 
   installPhase = ''
     install -Dv lilgit.bash $out/bin/lilgit.bash
   '';
 
-  installCheckInputs = [ bashInteractive git shellcheck bats ];
   inherit doInstallCheck;
+  installCheckInputs = [ bashInteractive git bats ];
   installCheckPhase = ''
     export LILGIT=$out/bin/lilgit.bash
-    ${shellcheck}/bin/shellcheck $out/bin/lilgit.bash
     cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
     bats tests/ephemeral.bats
-    echo WAT?
   '';
 
   meta = with lib; {

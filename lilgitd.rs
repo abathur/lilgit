@@ -1,36 +1,40 @@
-use std::{io, process::{Command}, str};
+use std::{io, process::Command, str};
 
-use libc::{getpid, fcntl};
 use git2::{Reference, Repository};
+use libc::{fcntl, getpid};
 
-use tokio::{
-    signal::unix::{signal, SignalKind},
-};
+use tokio::signal::unix::{signal, SignalKind};
 
 struct Report {
     is_repo: bool,
     is_dirty: bool,
-    desc: String
+    desc: String,
 }
 
 fn desc(detached: bool, name: &str) -> String {
     if detached {
-        return format!("detached @ {:.11}", name)
+        return format!("detached @ {:.11}", name);
     } else {
-        return name.to_string()
+        return name.to_string();
     }
 }
 
 // TODO std::path::{PathBuf} instead of String?
-fn dirty(repo_path: &String, repo: &Repository, detached: bool, head: &Reference, name: &String) -> bool {
+fn dirty(
+    repo_path: &String,
+    repo: &Repository,
+    detached: bool,
+    head: &Reference,
+    name: &String,
+) -> bool {
     if !detached {
         let branch = repo.find_branch(&name, git2::BranchType::Local).unwrap();
         match branch.upstream() {
-            Ok(val)  => {
+            Ok(val) => {
                 if head.target() != val.get().target() {
-                    return true
+                    return true;
                 }
-            },
+            }
             Err(_err) => {}
         }
         /*
@@ -62,16 +66,18 @@ fn dirty(repo_path: &String, repo: &Repository, detached: bool, head: &Reference
         return !y.status.success();
     }
     // TODO
-    return false
+    return false;
 }
 
 fn report(start_path: &String) -> Report {
     let repo = match Repository::discover(start_path) {
-        Ok(val)  => val,
-        Err(_err) => return Report {
-            is_repo: false,
-            is_dirty: false,
-            desc: "".to_string(),
+        Ok(val) => val,
+        Err(_err) => {
+            return Report {
+                is_repo: false,
+                is_dirty: false,
+                desc: "".to_string(),
+            }
         }
     };
     let detached = repo.head_detached().unwrap();
@@ -80,17 +86,21 @@ fn report(start_path: &String) -> Report {
     //     Err(e) => false,
     // };
     let head = repo.head().unwrap();
-    let name = if detached { head.target().unwrap().to_string() } else { head.shorthand().unwrap().to_string() };
+    let name = if detached {
+        head.target().unwrap().to_string()
+    } else {
+        head.shorthand().unwrap().to_string()
+    };
 
     return Report {
         is_repo: true,
         is_dirty: dirty(start_path, &repo, detached, &head, &name),
-        desc: desc(detached, &name)
+        desc: desc(detached, &name),
     };
 }
 
 #[tokio::main]
-async fn main() ->Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = io::stdin();
     let mut args = std::env::args();
     if args.len() == 1 {
@@ -109,7 +119,12 @@ async fn main() ->Result<(), Box<dyn std::error::Error>> {
                 Ok(n) => {
                     if n > 3 {
                         let out = report(&from_shell.trim().to_string());
-                        println!("{} {} {}", out.is_repo.to_string(), out.is_dirty.to_string(), out.desc);
+                        println!(
+                            "{} {} {}",
+                            out.is_repo.to_string(),
+                            out.is_dirty.to_string(),
+                            out.desc
+                        );
                     } else if n == 0 {
                         io_stream.recv().await;
                     }
@@ -122,13 +137,24 @@ async fn main() ->Result<(), Box<dyn std::error::Error>> {
     } else if args.len() == 2 {
         let path = std::env::args().nth(1).expect("repo path");
         let out = report(&path);
-        println!("{} {} {}", out.is_repo.to_string(), out.is_dirty.to_string(), out.desc);
+        println!(
+            "{} {} {}",
+            out.is_repo.to_string(),
+            out.is_dirty.to_string(),
+            out.desc
+        );
         Ok(())
     } else if args.len() > 2 {
         &args.next();
         for arg in args {
             let out = report(&arg);
-            println!("{} {} {} {}", arg, out.is_repo.to_string(), out.is_dirty.to_string(), out.desc);
+            println!(
+                "{} {} {} {}",
+                arg,
+                out.is_repo.to_string(),
+                out.is_dirty.to_string(),
+                out.desc
+            );
         }
         Ok(())
     } else {
