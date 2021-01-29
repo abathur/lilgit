@@ -11,13 +11,92 @@
 
 use std::{io, path::Path, process::Command, str};
 
-use git2::{Reference, Repository};
+use git2::{ErrorCode::UnbornBranch, Reference, Repository};
 use tokio::signal::unix::{signal, SignalKind};
 
 struct Report {
     is_repo: bool,
     is_dirty: bool,
     description: String,
+}
+
+impl Report {
+    pub fn new(start_path: &Path) -> Self {
+        let repo = match Repository::discover(start_path) {
+            Ok(val) => val,
+            Err(_e) => {
+                return Report {
+                    is_repo: false,
+                    is_dirty: false,
+                    description: "".to_string(),
+                }
+            }
+        };
+        let head = match repo.head() {
+            Ok(head) => head,
+            Err(e) => {
+                // probably a new repo
+                match e.code() {
+                    UnbornBranch => {
+                        let msg = e.message();
+                        // e.message: "reference \'refs/heads/spangles\' not found"
+                        if msg.starts_with("reference \'refs/heads/") {
+                            return Report {
+                                is_repo: true,
+                                is_dirty: false,
+                                description: branch_from_unborn_error(msg),
+                            };
+                        } else {
+                            eprintln!("good question, wtf?");
+                            return Report {
+                                is_repo: false,
+                                is_dirty: false,
+                                description: "error :(".to_string(),
+                            };
+                        }
+                    }
+                    _ => {
+                        eprintln!("good question, wtf?");
+                        return Report {
+                            is_repo: false,
+                            is_dirty: false,
+                            description: "error :(".to_string(),
+                        };
+                    }
+                }
+            }
+        };
+        let detached = match repo.head_detached() {
+            Ok(detached) => detached,
+            Err(_e) => false,
+        };
+        let name = if detached {
+            head.target()
+                .expect("if we've got a head, we've got a target")
+                .to_string()
+        } else {
+            head.shorthand()
+                .expect("if we've got a head, it's got a shorthand")
+                .to_string()
+        };
+
+        return Self {
+            is_repo: true,
+            is_dirty: dirty(start_path, &repo, detached, &head, &name),
+            description: description(detached, &name),
+        };
+    }
+}
+
+// extract name from "reference \'refs/heads/spangles\' not found"
+fn branch_from_unborn_error(msg: &str) -> String {
+    return match msg.strip_prefix("reference \'refs/heads/") {
+        Some(val) => match val.strip_suffix("\' not found") {
+            Some(val) => val.to_string(),
+            None => "".to_string(),
+        },
+        None => "".to_string(),
+    };
 }
 
 fn description(detached: bool, name: &str) -> String {
@@ -68,14 +147,14 @@ fn dirty(
             }
             Err(_err) => {}
         }
-        /*
-        TODO: try out some alternatives to this to see how they perform
 
-        The python implementation was outsourcing this to the underlying
-        commands because status and diff were very slow via pygit2. I
-        don't really know if those are just inherently slow in libgit2,
-        or other approaches may be more tractable via rust.
-        */
+        // TODO: try out some alternatives to this to see how they perform
+
+        // The python implementation was outsourcing this to the underlying
+        // commands because status and diff were very slow via pygit2. I
+        // don't really know if those are just inherently slow in libgit2,
+        // or other approaches may be more tractable via rust.
+
         let mut y = Command::new("git")
             .arg("-C")
             .arg(repo_path)
@@ -99,97 +178,76 @@ fn dirty(
     return false;
 }
 
-fn report(start_path: &Path) -> Report {
-    // return early if we aren't in a repo
-    let repo = match Repository::discover(start_path) {
-        Ok(val) => val,
-        Err(_err) => {
-            return Report {
-                is_repo: false,
-                is_dirty: false,
-                description: "".to_string(),
-            }
-        }
-    };
-    let detached = match repo.head_detached() {
-        Ok(detached) => detached,
-        Err(e) => false,
-    };
-    let head = repo.head().expect("oh god, I hope we always have a head");
-    let name = if detached {
-        head.target()
-            .expect("if we've got a head, we've got a target")
-            .to_string()
-    } else {
-        head.shorthand()
-            .expect("if we've got a head, it's got a shorthand")
-            .to_string()
-    };
-
-    return Report {
-        is_repo: true,
-        is_dirty: dirty(start_path, &repo, detached, &head, &name),
-        description: description(detached, &name),
-    };
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = io::stdin();
+    /*
+    very minimal arg handling
+    - normal use: call w/o args, write paths to stdin
+    -  debug use: each arg treated as a path to check
+    */
     let mut args = std::env::args();
-    if args.len() == 1 {
-        let mut io_stream = signal(SignalKind::io())?;
-        // get SIGINT, but do nothing with it (keep ctrl-c from killing us)
-        let mut _int_stream = signal(SignalKind::interrupt())?;
+    match args.len() {
+        // golden path, only arg is $0
+        1 => {
+            let mut io_stream = signal(SignalKind::io())?;
+            // get SIGINT, but do nothing with it (keep ctrl-c from killing us)
+            let mut _int_stream = signal(SignalKind::interrupt())?;
 
-        loop {
-            // TODO: maybe worth declaring once and clearing
-            // i.e. from_shell.clear();
-            let mut from_shell = String::new();
-            match input.read_line(&mut from_shell) {
-                Ok(n) => {
-                    if n > 3 {
-                        let arg = from_shell.trim().to_string();
-                        let out = report(&Path::new(&arg));
-                        println!(
-                            "{} {} {}",
-                            out.is_repo.to_string(),
-                            out.is_dirty.to_string(),
-                            out.description
-                        );
-                    } else if n == 0 {
+            loop {
+                // TODO: maybe worth declaring once and clearing
+                // i.e. from_shell.clear();
+                let mut from_shell = String::new();
+                match input.read_line(&mut from_shell) {
+                    Ok(n) => {
+                        if n > 3 {
+                            let arg = from_shell.trim().to_string();
+                            let out = Report::new(&Path::new(&arg));
+                            println!(
+                                "{} {} {}",
+                                out.is_repo.to_string(),
+                                out.is_dirty.to_string(),
+                                out.description
+                            );
+                        } else if n == 0 {
+                            io_stream.recv().await;
+                        }
+                    }
+                    Err(_err) => {
                         io_stream.recv().await;
                     }
                 }
-                Err(_err) => {
-                    io_stream.recv().await;
-                }
             }
         }
-    } else if args.len() == 2 {
-        let arg = std::env::args().nth(1).expect("repo path");
-        let out = report(&Path::new(&arg));
-        println!(
-            "{} {} {}",
-            out.is_repo.to_string(),
-            out.is_dirty.to_string(),
-            out.description
-        );
-        Ok(())
-    } else if args.len() > 2 {
-        &args.next();
-        for arg in args {
-            let out = report(&Path::new(&arg));
+        // a single arg
+        2 => {
+            let arg = std::env::args().nth(1).expect("repo path");
+            let out = Report::new(&Path::new(&arg));
             println!(
-                "{} {} {} {}",
-                arg,
+                "{} {} {}",
                 out.is_repo.to_string(),
                 out.is_dirty.to_string(),
                 out.description
             );
+            Ok(())
         }
-        Ok(())
-    } else {
-        Ok(())
+        // more than 1 arg
+        // Note: only handled separate from 1-arg to print path w/ check
+        _ => {
+            // skip arg $0
+            &args.next();
+            // treat all remaining args as paths
+            for arg in args {
+                let out = Report::new(&Path::new(&arg));
+                println!(
+                    "{} {} {} {}",
+                    arg, // also print the path alongside each
+                    out.is_repo.to_string(),
+                    out.is_dirty.to_string(),
+                    out.description
+                );
+            }
+            Ok(())
+        }
     }
 }
