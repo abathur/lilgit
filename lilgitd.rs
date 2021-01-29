@@ -25,7 +25,9 @@ fn dirty(
     name: &str,
 ) -> bool {
     if !detached {
-        let branch = repo.find_branch(&name, git2::BranchType::Local).unwrap();
+        let branch = repo.find_branch(&name, git2::BranchType::Local).expect(
+            "should always have a branch (we know repo is true, and that we aren't detached)",
+        );
         match branch.upstream() {
             Ok(val) => {
                 if head.target() != val.get().target() {
@@ -77,16 +79,19 @@ fn report(start_path: &Path) -> Report {
             }
         }
     };
-    let detached = repo.head_detached().unwrap();
-    // let detached = match repo.head_detached() {
-    //     Ok(detached) => detached,
-    //     Err(e) => false,
-    // };
-    let head = repo.head().unwrap();
+    let detached = match repo.head_detached() {
+        Ok(detached) => detached,
+        Err(e) => false,
+    };
+    let head = repo.head().expect("oh god, I hope we always have a head");
     let name = if detached {
-        head.target().unwrap().to_string()
+        head.target()
+            .expect("if we've got a head, we've got a target")
+            .to_string()
     } else {
-        head.shorthand().unwrap().to_string()
+        head.shorthand()
+            .expect("if we've got a head, it's got a shorthand")
+            .to_string()
     };
 
     return Report {
