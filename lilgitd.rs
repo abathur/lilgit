@@ -28,6 +28,27 @@ fn dirty(
         let branch = repo.find_branch(&name, git2::BranchType::Local).expect(
             "should always have a branch (we know repo is true, and that we aren't detached)",
         );
+        /*
+        Point of uncertainty/contention:
+
+            @lovesegfault: You should be handling the error, I think. Even if
+            just by logging that it happened. Check out tracing and log for
+            good crates to do that.
+
+            Alternatively, there's always eprintln!
+
+            @cole-h Prefer writeln!(std::io::stderr(), "msg") over eprintln!
+            in order to not panic and instead propagate (or handle) the error.
+
+        I'm less sure (but I may be missing the point). The upstream may just
+        not be set, so I don't see it as a real error (but it's a very real
+        possibility--not one I can use expect on). It's just a sign we can
+        return early.
+
+        As currently implemented, we're running in the background
+        (via coproc) of a shell session, so AFAIK anything we print will end up
+        showing in the user's terminal.
+        */
         match branch.upstream() {
             Ok(val) => {
                 if head.target() != val.get().target() {
@@ -64,11 +85,11 @@ fn dirty(
         }
         return !y.status.success();
     }
-    // TODO
     return false;
 }
 
 fn report(start_path: &Path) -> Report {
+    // return early if we aren't in a repo
     let repo = match Repository::discover(start_path) {
         Ok(val) => val,
         Err(_err) => {
