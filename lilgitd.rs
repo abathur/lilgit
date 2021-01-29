@@ -8,10 +8,10 @@ use tokio::signal::unix::{signal, SignalKind};
 struct Report {
     is_repo: bool,
     is_dirty: bool,
-    desc: String,
+    description: String,
 }
 
-fn desc(detached: bool, name: &str) -> String {
+fn description(detached: bool, name: &str) -> String {
     if detached {
         return format!("detached @ {:.11}", name);
     } else {
@@ -76,7 +76,7 @@ fn report(start_path: &String) -> Report {
             return Report {
                 is_repo: false,
                 is_dirty: false,
-                desc: "".to_string(),
+                description: "".to_string(),
             }
         }
     };
@@ -95,7 +95,7 @@ fn report(start_path: &String) -> Report {
     return Report {
         is_repo: true,
         is_dirty: dirty(start_path, &repo, detached, &head, &name),
-        desc: desc(detached, &name),
+        description: description(detached, &name),
     };
 }
 
@@ -123,7 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             "{} {} {}",
                             out.is_repo.to_string(),
                             out.is_dirty.to_string(),
-                            out.desc
+                            out.description
                         );
                     } else if n == 0 {
                         io_stream.recv().await;
@@ -141,7 +141,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "{} {} {}",
             out.is_repo.to_string(),
             out.is_dirty.to_string(),
-            out.desc
+            out.description
         );
         Ok(())
     } else if args.len() > 2 {
@@ -153,7 +153,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 arg,
                 out.is_repo.to_string(),
                 out.is_dirty.to_string(),
-                out.desc
+                out.description
             );
         }
         Ok(())
