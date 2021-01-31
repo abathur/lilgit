@@ -120,62 +120,53 @@ fn dirty(
     let branch = repo
       .find_branch(&name, git2::BranchType::Local)
       .expect("should always have a branch (we know repo is true, and that we aren't detached)");
-    /*
-    Point of uncertainty/contention:
 
-        @lovesegfault: You should be handling the error, I think. Even if
-        just by logging that it happened. Check out tracing and log for
-        good crates to do that.
-
-        Alternatively, there's always eprintln!
-
-        @cole-h Prefer writeln!(std::io::stderr(), "msg") over eprintln!
-        in order to not panic and instead propagate (or handle) the error.
-
-    I'm less sure (but I may be missing the point). The upstream may just
-    not be set, so I don't see it as a real error (but it's a very real
-    possibility--not one I can use expect on). It's just a sign we can
-    return early.
-
-    As currently implemented, we're running in the background
-    (via coproc) of a shell session, so AFAIK anything we print will end up
-    showing in the user's terminal.
-    */
+    // check for upstream (and record whether we do)
+    let mut upstream = None;
     match branch.upstream() {
       Ok(val) => {
+        upstream = Some(true);
         if head.target() != val.get().target() {
+          // return true early if head.target == upstream.target
           return true;
         }
       }
-      Err(_err) => {}
+      Err(_err) => {
+        upstream = Some(false);
+      }
     }
 
-    // TODO: try out some alternatives to this to see how they perform
+    /*
+    I've tried a few git2 approaches to this and TL;DR:
+    Answering this with any sort of diff through libgit2
+    is painfully slow on big repos.
 
-    // The python implementation was outsourcing this to the underlying
-    // commands because status and diff were very slow via pygit2. I
-    // don't really know if those are just inherently slow in libgit2,
-    // or other approaches may be more tractable via rust.
-
-    let mut y = Command::new("git")
-      .arg("-C")
-      .arg(repo_path)
-      .arg("diff")
-      .arg("--quiet")
-      .arg("@{u}")
-      .output()
-      .expect("failed to execute process");
-    if y.status.code() == Some(128) {
-      y = Command::new("git")
+    Also stumbled on someone corroborating this observation:
+    https://github.com/Kurt-Bonatz/pursue/commit/a8c10a20d91ad19c8a0e799f2a7de3f41ef0a8b3
+    */
+    let code = if upstream == Some(true) {
+      // use upstream
+      Command::new("git")
+        .arg("-C")
+        .arg(repo_path)
+        .arg("diff")
+        .arg("--quiet")
+        .arg("@{u}")
+        .status()
+    } else {
+      // just use HEAD
+      Command::new("git")
         .arg("-C")
         .arg(repo_path)
         .arg("diff")
         .arg("--quiet")
         .arg("HEAD")
-        .output()
-        .expect("failed to execute process");
+        .status()
+    };
+    match code {
+      Ok(val) => return !val.success(),
+      Err(_e) => return false,
     }
-    return !y.status.success();
   }
   return false;
 }
