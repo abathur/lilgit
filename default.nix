@@ -8,9 +8,9 @@ let
   # src = fetchFromGitHub {
   #   owner = "abathur";
   #   repo = "lilgit";
-  #   rev = "30d7ba3d3bf859d77606847861d0552725174f76";
+  #   rev = "0924de1e75810ca1799b09a17aa0d5290428087b";
   #   # rev = "v${version}";
-  #   hash = "sha256-ykcNaEzcNZcMvspuRjJpJv8pbSVokQiaxGAbGU2Tqe0=";
+  #   hash = "sha256-+EN7KuNgS7FOrdSEx9jPb9aYtXPHi4ACMRWN7GE7BjM=";
   # };
   lilgitd = callPackage ./lilgitd.nix { };
 in
@@ -30,7 +30,7 @@ resholvePackage rec {
   checkInputs = [ rustfmt shellcheck ];
   checkPhase = ''
     ${shellcheck}/bin/shellcheck lilgit.bash
-    ${rustfmt}/bin/rustfmt lilgitd.rs --check --edition 2018
+    ${rustfmt}/bin/rustfmt lilgitd.rs --check
   '';
 
   installPhase = ''
