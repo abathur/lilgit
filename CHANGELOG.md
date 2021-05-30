@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.0 (Jul 8 2021)
+- Work around an issue with dangling lilgitd processes left
+  when you open/close or start/exit shells. This entails
+  adding `__go_off_now_lilgit` to an EXIT trap in your shell
+- Fix some libiconv issues caused by shifts upstream in nixpkgs.
+
 ## Jan 23 2021
 Rewrote lilgitd in Rust (from Python).
 

@@ -5,6 +5,7 @@
 # copying the FDs over to our own var is a fine compromise
 coproc lilgitd
 declare -a __lilgitter=("${COPROC[@]}")
+__lilgit_pid="$COPROC_PID"
 
 __go_on_now_lilgit(){
   local dirty name
@@ -19,6 +20,11 @@ __go_on_now_lilgit(){
       printf ' %s' "$name"
     fi
   fi
+}
+
+# caller's responsible I guess?
+__go_off_now_lilgit(){
+  kill "$__lilgit_pid"
 }
 
 # shellcheck disable=SC2034,SC2016

@@ -57,9 +57,13 @@ lilgit = import (self.fetchFromGitHub {
 }) { };
 ```
 
-From here, you'll need to `source lilgit.bash` from your bashrc/profile,  add `$__lilgit` to your `PS1`, and make sure your profile can find lilgit when it runs.
+From here, you'll need to:
+1. `source lilgit.bash` from your bashrc/profile
+2. add `$__lilgit` to your `PS1`
+3. add `__go_off_now_lilgit` to an EXIT trap
+4. make sure your profile can find lilgit when it runs
 
-There are two main ways to do this:
+There are two main ways to do this last part:
 1. add `lilgit` to your system/user packages, and let your profile find lilgit via `PATH` lookup
 2. explicitly write/substitute the correct path to lilgit into your profile
 
