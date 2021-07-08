@@ -52,8 +52,8 @@ If you use `bash` and an `*-unstable` channel, you can get the lilgit package li
 lilgit = import (self.fetchFromGitHub {
   owner = "abathur";
   repo = "lilgit";
-  rev = "86674bbd819f900d70706b9c79ff101eba3f8546";
-  hash = "sha256-dUU9NEOImoPHT297SCJqUHlDpd0QEzc8OmPZ6FEth2M=";
+  rev = "2e7977c9298a3b6f90352baf706503f3dcf243cf";
+  hash = "sha256-/cQbk5VAs84HWEAoHhmxQZJEDCLsMoc7Lt0tEXcIZKE=";
 }) { };
 ```
 
