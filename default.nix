@@ -2,7 +2,7 @@
 
 with pkgs;
 # TODO: below may be outdated per riir
-# { lib, resholvePackage, fetchFromGitHub, doCheck ? true, doInstallCheck ? true, shellcheck, bashInteractive, git }:
+# { lib, resholve, fetchFromGitHub, doCheck ? true, doInstallCheck ? true, shellcheck, bashInteractive, git }:
 let
   src = lib.cleanSource ./.;
   # src = fetchFromGitHub {
@@ -14,7 +14,7 @@ let
   # };
   lilgitd = callPackage ./lilgitd.nix { };
 in
-resholvePackage rec {
+resholve.mkDerivation rec {
   version = "unset";
   pname = "lilgit";
   inherit src;
