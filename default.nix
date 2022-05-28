@@ -37,13 +37,17 @@ resholve.mkDerivation rec {
     install -Dv lilgit.bash $out/bin/lilgit.bash
   '';
 
-  inherit doInstallCheck;
-  installCheckInputs = [ bashInteractive git bats ];
-  installCheckPhase = ''
-    export LILGIT=$out/bin/lilgit.bash
-    cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
-    bats tests/ephemeral.bats
-  '';
+  passthru.tests.upstream = lilgit.unresholved.overrideAttrs (old: {
+        name = "${old.name}-tests";
+        dontInstall = true; # just need the build directory
+        inherit doInstallCheck;
+        installCheckInputs = [ bashInteractive git bats ];
+        installCheckPhase = ''
+          export LILGIT=$out/bin/lilgit.bash
+          cat tests/head.bats tests/repo.bash > tests/ephemeral.bats
+          bats tests/ephemeral.bats
+        '';
+      });
 
   meta = with lib; {
     description = "A smol (quick) git status prompt plugin";
