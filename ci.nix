@@ -24,7 +24,7 @@ stdenv.mkDerivation {
   '';
 
   LILGIT="${our_lilgit}/bin/lilgit.bash";
-  GITSTATUS="${gitAndTools.gitstatus}/gitstatus.plugin.sh";
+  GITSTATUS="${gitAndTools.gitstatus}/share/gitstatus/gitstatus.plugin.sh";
   NIXPKGS="${nixpkgs}";
 
   checkPhase = ''
