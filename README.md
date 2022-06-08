@@ -52,8 +52,8 @@ If you use `bash` and an `*-unstable` channel, you can get the lilgit package li
 lilgit = import (self.fetchFromGitHub {
   owner = "abathur";
   repo = "lilgit";
-  rev = "2e7977c9298a3b6f90352baf706503f3dcf243cf";
-  hash = "sha256-/cQbk5VAs84HWEAoHhmxQZJEDCLsMoc7Lt0tEXcIZKE=";
+  rev = "v0.2.1";
+  hash = "sha256-FHDIm9sb4lPfoyn369cbOEI1UcWp3eSk0HEbIp/3NuA=";
 }) { };
 ```
 
@@ -71,9 +71,9 @@ The exact steps you'd take to write/substitute it will depend on how you have yo
 
 I personally define a separate package for my bashrc, which looks a little like:
 ```nix
-{ resholvePackage, shellcheck, lilgit }:
+{ resholve, shellcheck, lilgit }:
 
-resholvePackage rec {
+resholve.mkDerivation rec {
   version = "unset";
   pname = "bashrc";
 
