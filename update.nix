@@ -1,6 +1,14 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ mkShell
+, rustc
+, cargo
+, crate2nix
+, openssl
+, libgit2
+, cmake
+, pkg-config
+}:
 
-with pkgs; pkgs.mkShell {
+mkShell {
   buildInputs = [ rustc cargo crate2nix openssl openssl.dev libgit2 cmake pkg-config ];
   # cargo build
   shellHook = ''

@@ -2,7 +2,7 @@
 
 with pkgs;
 let
-  lilgit = callPackage ./default.nix { doInstallCheck=false; };
+  lilgit = (builtins.getFlake (toString ./.)).packages.${builtins.currentSystem}.default;
   demo = ./prompt_demo.sh;
 in
 pkgs.mkShell {

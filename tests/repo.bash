@@ -1,17 +1,17 @@
 @test "${RUNS:-1}x clean @ master" {
   git checkout master
-	clean "master"
+  clean "master"
 }
 
 @test "${RUNS:-1}x clean @ detached" {
-	local target=$(git rev-parse --short=11 HEAD~1)
-	git checkout $target
+  local target=$(git rev-parse --short=11 HEAD~1)
+  git checkout $target
   clean "detached @ $target"
 }
 
 @test "${RUNS:-1}x clean @ new branch" {
   git checkout master
-	git checkout -b yeehaw
+  git checkout -b yeehaw
   clean "yeehaw"
 }
 

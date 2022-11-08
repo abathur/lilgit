@@ -8,7 +8,7 @@ setup_file(){
   PATH="$TEST_TMP:$PATH"
   pushd nixpkgs
   git config --local feature.manyFiles true
-  git checkout master
+  git checkout HEAD~1000
   git clean -f
   git config user.email "you@example.com"
   git config user.name "Your Name"

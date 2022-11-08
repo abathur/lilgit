@@ -3,7 +3,7 @@
 with pkgs;
 let
   nixpkgs = ../nixpkgs;
-  our_lilgit = callPackage ./default.nix { };
+  our_lilgit = (builtins.getFlake (toString ./.)).packages.${builtins.currentSystem}.default;
   # override for bash_5
   our_bats = bats.overrideAttrs ( old: rec {
     buildInputs = [ bash_5 ];
