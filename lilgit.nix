@@ -10,13 +10,13 @@ let
   lilgitd = callPackage ./lilgitd.nix { inherit craneLib; };
 in
 resholve.mkDerivation rec {
-  version = "unset";
+  version = "0.3.0";
   pname = "lilgit";
   src = lib.cleanSource ./.;
   solutions = {
     plugin = {
       scripts = [ "bin/lilgit.bash" ];
-      inputs = [ lilgitd git coreutils ];
+      inputs = [ lilgitd ];
       interpreter = "none";
     };
   };

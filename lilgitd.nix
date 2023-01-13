@@ -9,9 +9,6 @@
 }:
 
 craneLib.buildPackage {
-  pname = "lilgitd";
-  version = "unset";
-
   src = craneLib.cleanCargoSource ./.;
 
   /* Jan 13 2022:
