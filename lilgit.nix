@@ -3,10 +3,11 @@
 , callPackage
 , git
 , coreutils
+, craneLib
 }:
 
 let
-  lilgitd = callPackage ./lilgitd.nix { };
+  lilgitd = callPackage ./lilgitd.nix { inherit craneLib; };
 in
 resholve.mkDerivation rec {
   version = "unset";

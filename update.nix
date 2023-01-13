@@ -1,7 +1,6 @@
 { mkShell
 , rustc
 , cargo
-, crate2nix
 , openssl
 , libgit2
 , cmake
@@ -9,10 +8,9 @@
 }:
 
 mkShell {
-  buildInputs = [ rustc cargo crate2nix openssl openssl.dev libgit2 cmake pkg-config ];
-  # cargo build
+  buildInputs = [ rustc cargo openssl openssl.dev libgit2 cmake pkg-config ];
+
   shellHook = ''
     cargo update
-    crate2nix generate
   '';
 }

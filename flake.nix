@@ -1,16 +1,16 @@
 {
   inputs = {
-    /*
-    this pin dates to oct 22 2022; after that I start running
-    into https://github.com/kolloch/crate2nix/issues/263; I don't
-    grok rust or darwin builds well enough for it to be super obvs
-    what's going on here...
-    */
-    nixpkgs.url = "github:nixos/nixpkgs/4f8287f3d597c73b0d706cfad028c2d51821f64d";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
+    };
+    crane = {
+      url = "github:ipetkov/crane";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.flake-compat.follows = "flake-compat";
     };
     bats-require = {
       url = "github:abathur/bats-require";
@@ -20,12 +20,12 @@
     };
   };
 
-  # description = "Bash library for neighborly signal sharing";
+  description = "A smol (quick) git status prompt plugin";
 
-  outputs = { self, nixpkgs, flake-utils, flake-compat, bats-require }:
+  outputs = { self, nixpkgs, flake-utils, flake-compat, bats-require, crane }:
     {
       overlays.default = final: prev: {
-        lilgit = prev.callPackage ./lilgit.nix { };
+        lilgit = prev.callPackage ./lilgit.nix { craneLib = crane.mkLib prev; };
       };
       # shell = ./shell.nix;
     } // flake-utils.lib.eachDefaultSystem (system:
