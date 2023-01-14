@@ -31,7 +31,10 @@ jobs:
     - uses: cachix/install-nix-action@v18
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - run: echo declare -p __lilgit | nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; rev="'${GITHUB_SHA}'"; allRefs = true; } + "/shell.nix")'
+    - name: Test flake-based demo
+      run: echo true | nix develop github:abathur/lilgit
+    - name: Test traditional demo
+      run: echo true | nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; rev="'${GITHUB_SHA}'"; allRefs = true; } + "/shell.nix")'
   # macOS only because it depends on bsd 'footprint' for
   # easy measuring of RAM footprint...
   performance:
