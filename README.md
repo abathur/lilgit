@@ -2,7 +2,7 @@
 
 ![lilgit demo](lilgit.gif)
 
-Early on Christmas Eve, @colemickens was kind enough to mention gitstatusd as a way to cut down on prompt-induced command lag in large repos like nixpkgs.
+Early on Christmas Eve 2020, @colemickens was kind enough to mention gitstatusd as a way to cut down on prompt-induced command lag in large repos like nixpkgs.
 
 I noticed it was still a little slow, and that it returns a lot of detail I don't use in my prompt--so I wrote lilgit to figure out if I could trade detail for speed. (See [Performance](#performance) for more.)
 
@@ -10,21 +10,22 @@ Merry Christmas.
 
 ## How do I try it out?
 
-If you have Nix installed and are on any of the `-unstable` channels you can open a lilgit ~demo shell by running:
+If you have Nix installed you can open a lilgit ~demo shell by running:
 
 ```console
-nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
+# if you have nix-command and flakes enabled:
+nix develop github:abathur/lilgit
 
-# If you're on a different channel you can specify it explicitly--but
-# I won't *recommend* it since you may be in for a long build/wait...
-nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")' -I nixpkgs=channel:nixpkgs-unstable
+# otherwise, you can use either of the below:
+nix develop github:abathur/lilgit --extra-experimental-features 'flakes nix-command'
+nix-shell -E 'import (fetchGit { url="https://github.com/abathur/lilgit"; ref="main"; } + "/shell.nix")'
 ```
 
 Each time you run a command, it'll clearly indicate lilgit's output, and how long it took to generate.
 
 ## What does it cover?
 
-Some of the speed comes from what I've left out, so I know it won't be acceptable for everyone. I'm happy to discuss cases where you think it is wrong or misleading (especially if we can make it more accurate without a large performance penalty).
+Some of the speed comes from what I've left out, so I know it won't work for everyone. I'm happy to discuss cases where you think it is wrong or misleading (especially if we can make it more accurate without a large performance penalty).
 
 It prints a "name", which is:
 - blank if not in repo
@@ -46,14 +47,16 @@ I don't see any reason why it shouldn't work in other shells, and I'm [open to h
 
 ## How do I use this?
 
-If you use `bash` and an `*-unstable` channel, you can get the lilgit package like:
+> Note: still getting this updated for flakes. If you want to see a full flake example, check out https://github.com/abathur/bashrc.nix.
+
+First you'll need the lilgit package:
 
 ```nix
 lilgit = import (self.fetchFromGitHub {
   owner = "abathur";
   repo = "lilgit";
-  rev = "v0.2.1";
-  hash = "sha256-FHDIm9sb4lPfoyn369cbOEI1UcWp3eSk0HEbIp/3NuA=";
+  rev = "v0.3.1";
+  hash = "sha256-1HDIm9sb4lPfoyn369cbOEI1UcWp3eSk0HEbIp/3NuA=";
 }) { };
 ```
 
