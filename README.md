@@ -12,7 +12,7 @@ Merry Christmas.
 
 If you have Nix installed you can open a lilgit ~demo shell by running:
 
-```console
+```bash
 # if you have nix-command and flakes enabled:
 nix develop github:abathur/lilgit
 
