@@ -2,11 +2,9 @@
 
 ![lilgit demo](lilgit.gif)
 
-Early on Christmas Eve 2020, @colemickens was kind enough to mention gitstatusd as a way to cut down on prompt-induced command lag in large repos like nixpkgs.
+Prompt-induced command lag in large repos like https://github.com/nixos/nixpkgs is annoying.
 
-I noticed it was still a little slow, and that it returns a lot of detail I don't use in my prompt--so I wrote lilgit to figure out if I could trade detail for speed. (See [Performance](#performance) for more.)
-
-Merry Christmas.
+Something like `gitstatusd` is an improvement, but it still felt slow and returns a lot of detail I don't use in my prompt. I wrote lilgit to see if I could trade detail for speed. (TL;DR: yes. See [Performance](#performance) for more.)
 
 ## How do I try it out?
 
@@ -43,68 +41,62 @@ That name is:
 
 I assume it just works in bash for now, because the MVP depends on bash `coproc`.
 
-I don't see any reason why it shouldn't work in other shells, and I'm [open to help improving the daemonization model](https://github.com/abathur/lilgit/issues/2).
+It _should_ work in other shells, and I'm [open to help improving the daemonization model](https://github.com/abathur/lilgit/issues/2) to pave the way :)
 
 ## How do I use this?
 
-> Note: still getting this updated for flakes. If you want to see a full flake example, check out https://github.com/abathur/bashrc.nix.
+You'll two main things to get started:
 
-First you'll need the lilgit package:
+1. get the lilgit package
+2. prepare your rc/profile script:
+   - `source lilgit.bash`
+   - add `$__lilgit` to your `PS1`
+   - add `__go_off_now_lilgit` to an EXIT trap
+
+Let's look at each of these in a little more detail.
+
+### Getting the lilgit package
+
+If you're using flakes, you can see how I pull lilgit into my [bashrc flake]
+(https://github.com/abathur/bashrc.nix/blob/main/flake.nix).
+
+If you're using traditional Nix, you can use something like:
 
 ```nix
-lilgit = import (self.fetchFromGitHub {
+lilgit = (import (pkgs.fetchFromGitHub {
   owner = "abathur";
   repo = "lilgit";
   rev = "v0.3.1";
-  hash = "sha256-1HDIm9sb4lPfoyn369cbOEI1UcWp3eSk0HEbIp/3NuA=";
-}) { };
+  hash = "sha256-vnK9LbhJHeSEiGA4sdWYrqTPvMEf9x0ykGulSyf2hYs=";
+})).default;
 ```
 
-From here, you'll need to:
-1. `source lilgit.bash` from your bashrc/profile
-2. add `$__lilgit` to your `PS1`
-3. add `__go_off_now_lilgit` to an EXIT trap
-4. make sure your profile can find lilgit when it runs
+### Preparing your rc/profile script
 
-There are two main ways to do this last part:
+If you use [resholve](https://github.com/abathur/resholve) for your rc/profile script, you can just drop lilgit in the inputs as below:
+
+```nix
+pkgs.resholve.writeScript "trivial-test" {
+  # interpreter can be "none" after nixos/nixpkgs#210761
+  interpreter = "${pkgs.bash}/bin/bash";
+  inputs = [ lilgit ];
+} ''
+source lilgit.bash
+export PS1="$__lilgit"
+trap __go_off_now_lilgit EXIT
+''
+```
+
+You can find a complete real-world example of how I do this in https://github.com/abathur/bashrc.nix
+
+If you don't use `resholve`, you'll want to do one of the following:
 1. add `lilgit` to your system/user packages, and let your profile find lilgit via `PATH` lookup
 2. explicitly write/substitute the correct path to lilgit into your profile
 
-The exact steps you'd take to write/substitute it will depend on how you have your bashrc/profile set up.
-
-I personally define a separate package for my bashrc, which looks a little like:
-```nix
-{ resholve, shellcheck, lilgit }:
-
-resholve.mkDerivation rec {
-  version = "unset";
-  pname = "bashrc";
-
-  src = ./.;
-
-  installPhase = ''
-    install -Dv bashrc $out/bin/bashrc
-  '';
-
-  solutions = {
-    profile = {
-      interpreter = "none";
-      inputs = [ lilgit ];
-      scripts = [ "bin/bashrc" ];
-    };
-  };
-
-  doInstallCheck = true;
-  installCheckInputs = [ shellcheck ];
-  installCheckPhase = ''
-    shellcheck -x $out/bin/bashrc
-  '';
-}
-```
 
 ## Performance
 
-This isn't a perfect picture, but you can find a benchmark table in each CI run's "performance" job. Here's an example:
+It isn't a perfect picture, but you can find a benchmark table in each CI run's "performance" job. Here's an example:
 
 ```
 test                                          status-provider  time   footprint
@@ -259,6 +251,8 @@ test                                          status-provider  time   footprint
 ```
 
 Notes:
-- Each test only pays the startup overhead once, and then runs the prompt-printing function the specified number of times. I've used a few different counts so that it's easier to get a sense of what the fixed startup costs and per-call performance.
-- I'm measuring the memory use with the bsd `footprint` command, because it seems to do a good job of measuring the persistent marginal overhead of the daemons (which GNU time was missing). Both gitparse.bash and lilgit.bash can trigger git invocations like `git diff --quiet` and `git status`, which take nearly 15MB against my local nixpkgs checkout according to GNU time. I'll be happy if anyone contributes a more accurate accounting of this.
-- The current difference in daemonization models for lilgit and gitstatus mean the reported numbers for both are a bit of a fiction relative to real world uses (lilgitd's per-instance use should be fairly stable--but it will currently run one instance per terminal; gitstatusd may continue to take up more memory as you use it against different repos).
+- Each test pays startup overhead once and runs the prompt-printing function the specified number of times. I used a few different counts so that it's easier to get a sense of the fixed startup costs and per-call performance.
+- Measures memory use with the bsd `footprint` command because it seems to do a good job of measuring the persistent marginal overhead of the daemons (which GNU time was missing). Both gitparse.bash and lilgit.bash can trigger git invocations like `git diff --quiet` and `git status`, which take nearly 15MB against my local nixpkgs checkout according to GNU time. I'll be happy if anyone contributes a more accurate accounting.
+- The current difference in daemonization models for lilgit and gitstatus mean the reported numbers for both are a bit of a fiction relative to real world uses.
+  - lilgitd's per-instance use should be fairly stable--but it will currently run one instance per terminal. (See #2 for more on ~fixing this.)
+  - the single instance of gitstatusd can take up more memory as you use it against different repos.

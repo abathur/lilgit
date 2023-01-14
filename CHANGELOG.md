@@ -1,5 +1,25 @@
 # Changelog
 
+## unreleased (...)
+- Test flake and traditional demos
+- Update instructions for flake-based demo
+- Update instructions for general flake usage
+
+## v0.3.1 (Jan 13 2023)
+- Update demo for flake
+
+## v0.3.0 (Jan 13 2023)
+- Convert to nix flake
+- switch from crate2nix -> crane
+- Update cargo deps
+
+## v0.2.1 (May 28 2022)
+- Track nixpkgs changes
+- Move tests into separate build
+
+## v0.2.0 (Dec 2 2021)
+- Update dependencies
+
 ## v0.1.0 (Jul 8 2021)
 - Work around an issue with dangling lilgitd processes left
   when you open/close or start/exit shells. This entails
