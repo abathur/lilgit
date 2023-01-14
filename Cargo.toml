@@ -1,6 +1,6 @@
 [package]
 name = "lilgitd"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Travis A. Everett <travis.a.everett@gmail.com>"]
 license = "MIT"
 readme = "README.md"

@@ -37,6 +37,7 @@
             self.overlays.default
           ];
         };
+        demo = ./prompt_demo.sh;
       in
         {
           packages = {
@@ -47,7 +48,13 @@
             inherit (pkgs) lilgit;
           };
           devShells = {
-            default = pkgs.callPackage ./update.nix { };
+            default = pkgs.mkShell {
+              buildInputs = [ pkgs.lilgit pkgs.bashInteractive ];
+              shellHook = ''
+                exec /usr/bin/env -i LILGITBASH="${pkgs.lilgit}/bin/lilgit.bash" ${pkgs.bashInteractive}/bin/bash --rcfile ${demo} --noprofile -i
+              '';
+            };
+            update = pkgs.callPackage ./update.nix { };
           };
         }
     );

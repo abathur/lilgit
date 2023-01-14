@@ -10,7 +10,7 @@ let
   lilgitd = callPackage ./lilgitd.nix { inherit craneLib; };
 in
 resholve.mkDerivation rec {
-  version = "0.3.0";
+  version = "0.3.1";
   pname = "lilgit";
   src = lib.cleanSource ./.;
   solutions = {

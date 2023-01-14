@@ -1,13 +1,10 @@
-{ pkgs ? import <nixpkgs> { } }:
-
-with pkgs;
-let
-  lilgit = (builtins.getFlake (toString ./.)).packages.${builtins.currentSystem}.default;
-  demo = ./prompt_demo.sh;
-in
-pkgs.mkShell {
-  buildInputs = [ lilgit bashInteractive ];
-  shellHook = ''
-    exec /usr/bin/env -i LILGITBASH="${lilgit}/bin/lilgit.bash" ${bashInteractive}/bin/bash --rcfile ${demo} --noprofile -i
-  '';
-}
+(import
+  (
+    let lock = builtins.fromJSON (builtins.readFile ./flake.lock); in
+    fetchTarball {
+      url = "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
+      sha256 = lock.nodes.flake-compat.locked.narHash;
+    }
+  )
+  { src = ./.; }
+).shellNix
