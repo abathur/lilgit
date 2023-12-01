@@ -28,7 +28,7 @@ stdenv.mkDerivation {
   NIXPKGS="${nixpkgs}";
 
   checkPhase = ''
-    git config features.manyFiles true
+    git config --file $NIXPKGS/.git/config features.manyFiles true
     mkdir $out
     patchShebangs .
     cat tests/head_nixpkgs.bats tests/repo.bash > tests/ephemeral.bats
