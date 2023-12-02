@@ -7,7 +7,7 @@
       flake = false;
     };
     crane = {
-      url = "github:ipetkov/crane/v0.12.2";
+      url = "github:ipetkov/crane/v0.13.1";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.flake-compat.follows = "flake-compat";

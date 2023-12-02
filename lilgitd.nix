@@ -25,6 +25,8 @@ craneLib.buildPackage {
 
   nativeBuildInputs = [ pkg-config ];
 
+  strictDeps = true;
+
   postPatch = ''
     substituteInPlace lilgitd.rs \
       --replace 'Command::new("git")' 'Command::new("${git}/bin/git")'
