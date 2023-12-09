@@ -9,9 +9,13 @@
  * - a description of the repo's checkout/worktree
  */
 
-use std::{io, path::Path, process::Command, str};
+use std::{io, path::Path, process::Command};
 
-use git2::{ErrorCode::UnbornBranch, Reference, Repository};
+use gix::{
+  head::Kind::{Detached, Symbolic, Unborn},
+  remote::Direction,
+  Head, Repository,
+};
 use tokio::signal::unix::{signal, SignalKind};
 
 struct Report {
@@ -22,119 +26,82 @@ struct Report {
 
 impl Report {
   pub fn new(start_path: &Path) -> Self {
-    let repo = match Repository::discover(start_path) {
+    let repo = match gix::discover(start_path) {
       Ok(val) => val,
       Err(_e) => {
+        // not a repo, return early
         return Report {
           is_repo: false,
           is_dirty: false,
           description: "".to_string(),
-        }
+        };
       }
     };
-    let head = match repo.head() {
-      Ok(head) => head,
-      Err(e) => {
-        // probably a new repo
-        match e.code() {
-          UnbornBranch => {
-            let msg = e.message();
-            // e.message: "reference \'refs/heads/spangles\' not found"
-            if msg.starts_with("reference \'refs/heads/") {
-              return Report {
-                is_repo: true,
-                is_dirty: false,
-                description: branch_from_unborn_error(msg),
-              };
-            } else {
-              eprintln!("good question, wtf?");
-              return Report {
-                is_repo: false,
-                is_dirty: false,
-                description: "error :(".to_string(),
-              };
-            }
-          }
-          _ => {
-            eprintln!("good question, wtf?");
-            return Report {
-              is_repo: false,
-              is_dirty: false,
-              description: "error :(".to_string(),
-            };
-          }
-        }
+
+    let head = repo.head().unwrap();
+
+    let (name, detached) = match head.clone().kind {
+      Symbolic(symref) => (symref.name.shorten().to_string(), false),
+      Detached {
+        target: object_id, ..
+      } => (object_id.to_string(), true),
+      Unborn(branch_name) => {
+        // repo, but no commits; return early
+        return Report {
+          is_repo: true,
+          is_dirty: false,
+          description: branch_name.shorten().to_string(),
+        };
       }
-    };
-    let detached = match repo.head_detached() {
-      Ok(detached) => detached,
-      Err(_e) => false,
-    };
-    let name = if detached {
-      head
-        .target()
-        .expect("if we've got a head, we've got a target")
-        .to_string()
-    } else {
-      head
-        .shorthand()
-        .expect("if we've got a head, it's got a shorthand")
-        .to_string()
     };
 
     return Self {
       is_repo: true,
       is_dirty: dirty(start_path, &repo, detached, &head, &name),
-      description: description(detached, &name),
+      description: if detached {
+        format!("detached @ {:.11}", name)
+      } else {
+        name.clone()
+      },
     };
   }
 }
 
-// extract name from "reference \'refs/heads/spangles\' not found"
-fn branch_from_unborn_error(msg: &str) -> String {
-  return match msg.strip_prefix("reference \'refs/heads/") {
-    Some(val) => match val.strip_suffix("\' not found") {
-      Some(val) => val.to_string(),
-      None => "".to_string(),
-    },
-    None => "".to_string(),
-  };
-}
-
-fn description(detached: bool, name: &str) -> String {
-  if detached {
-    return format!("detached @ {:.11}", name);
-  } else {
-    return name.to_string();
-  }
-}
-
-fn dirty(
-  repo_path: &Path,
-  repo: &Repository,
-  detached: bool,
-  head: &Reference,
-  name: &str,
-) -> bool {
+fn dirty(repo_path: &Path, repo: &Repository, detached: bool, head: &Head, name: &String) -> bool {
   if !detached {
     let branch = repo
-      .find_branch(&name, git2::BranchType::Local)
+      .find_reference(name.as_str())
       .expect("should always have a branch (we know repo is true, and that we aren't detached)");
 
-    // check for upstream (and record whether we do)
-    let mut upstream = None;
-    match branch.upstream() {
-      Ok(val) => {
-        upstream = Some(true);
-        if head.target() != val.get().target() {
-          // return true early if head.target == upstream.target
+    // TODO: unsure about direction
+    let upstream = match branch.remote(Direction::Fetch) {
+      Some(Ok(val)) => {
+        if head
+          .clone()
+          .into_peeled_id()
+          .expect("head resolves to id")
+          .as_ref()
+          != repo
+            .find_reference(&format!(
+              "refs/remotes/{}/{}",
+              val.name().expect("unnamed remote?").as_bstr(),
+              name
+            ))
+            .expect("remote reference exists")
+            .peel_to_id_in_place()
+            .expect("remote ref has an id")
+            .as_ref()
+        {
+          // return early when the branch target doesn't
+          // match the upstream's target (i.e., we've
+          // used reset to discard a commit)
           return true;
         }
+        Some(true)
       }
-      Err(_err) => {
-        upstream = Some(false);
-      }
-    }
+      None => Some(false),
+      Some(Err(_err)) => Some(false),
+    };
 
     /*
     I've tried a few git2 approaches to this and TL;DR:
@@ -143,6 +110,9 @@ fn dirty(
 
     Also stumbled on someone corroborating this observation:
     https://github.com/Kurt-Bonatz/pursue/commit/a8c10a20d91ad19c8a0e799f2a7de3f41ef0a8b3
+
+    TODO: but now that you're switching to gitoxide, it's worth
+    figuring out whether these are improved with its idioms.
     */
     let code = if upstream == Some(true) {
       // use upstream
@@ -228,7 +198,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Note: only handled separate from 1-arg to print path w/ check
     _ => {
       // skip arg $0
-      &args.next();
+      let _ = &args.next();
       // treat all remaining args as paths
       for arg in args {
         let out = Report::new(&Path::new(&arg));

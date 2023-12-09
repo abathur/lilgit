@@ -77,7 +77,6 @@ If you use [resholve](https://github.com/abathur/resholve) for your rc/profile s
 
 ```nix
 pkgs.resholve.writeScript "trivial-test" {
-  # interpreter can be "none" after nixos/nixpkgs#210761
   interpreter = "${pkgs.bash}/bin/bash";
   inputs = [ lilgit ];
 } ''

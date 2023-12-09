@@ -54,7 +54,19 @@
                 exec /usr/bin/env -i LILGITBASH="${pkgs.lilgit}/bin/lilgit.bash" ${pkgs.bashInteractive}/bin/bash --rcfile ${demo} --noprofile -i
               '';
             };
-            update = pkgs.callPackage ./update.nix { };
+            update = pkgs.mkShell {
+              buildInputs = with pkgs; [ rustc cargo openssl openssl.dev libgit2 cmake pkg-config ];
+
+              shellHook = ''
+                cargo update
+              '';
+            };
+            dev = pkgs.mkShell {
+              buildInputs = with pkgs; [ rustc cargo openssl openssl.dev libgit2 cmake pkg-config ];
+
+              shellHook = ''
+              '';
+            };
           };
         }
     );
