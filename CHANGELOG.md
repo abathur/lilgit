@@ -4,6 +4,7 @@
 - Test flake and traditional demos
 - Update instructions for flake-based demo
 - Update instructions for general flake usage
+- Track nixpkgs changes (and bump)
 
 ## v0.3.1 (Jan 13 2023)
 - Update demo for flake

@@ -5,7 +5,7 @@
 , openssl
 , libiconv
 , pkg-config
-, darwin
+, zlib
 }:
 
 craneLib.buildPackage {
@@ -20,7 +20,7 @@ craneLib.buildPackage {
     openssl
   ] ++ lib.optionals stdenv.isDarwin [
     libiconv
-    darwin.Security
+    zlib
   ];
 
   nativeBuildInputs = [ pkg-config ];
